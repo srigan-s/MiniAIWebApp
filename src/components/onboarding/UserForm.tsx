@@ -46,14 +46,20 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200">
-      <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl">
-          🧠
-        </div>
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to MiniAI!</h1>
-        <p className="text-gray-600">Let's get to know you better</p>
-      </div>
+<div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200">
+  <div className="text-center mb-8">
+    <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-400">
+      <img
+        src="/miniAiElement.png"
+        alt="MiniAI Logo"
+        className="w-12 h-12 object-contain"
+      />
+    </div>
+    <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to MiniAI!</h1>
+    <p className="text-gray-600">Let's get to know you better</p>
+  </div>
+</div>
+
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
