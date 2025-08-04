@@ -47,14 +47,17 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
 
   return (
     <div>
-      {/* Header Section with MiniAI Logo */}
+      {/* Header Section with rotating light green globe effect */}
       <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200 mb-8">
         <div className="text-center">
-          <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-400">
+          <div className="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center rounded-full bg-[#E6F2E9]">
+            {/* Rotating ring/globe effect */}
+            <div className="absolute inset-0 rounded-full border-4 border-[#A3D9A5] animate-spin-slow"></div>
+            {/* Logo */}
             <img
               src="/miniAiElement.png"
               alt="MiniAI Logo"
-              className="w-12 h-12 object-contain"
+              className="relative w-20 h-20 object-contain"
             />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to MiniAI!</h1>
@@ -118,6 +121,21 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
           Continue to Avatar Selection 🚀
         </button>
       </form>
+
+      {/* Extra: Add this style block or include these classes in your global CSS */}
+      <style>{`
+        @keyframes spin-slow {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        .animate-spin-slow {
+          animation: spin-slow 8s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
