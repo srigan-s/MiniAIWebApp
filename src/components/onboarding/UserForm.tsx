@@ -46,21 +46,23 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
   };
 
   return (
-<div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200">
-  <div className="text-center mb-8">
-    <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-400">
-      <img
-        src="/miniAiElement.png"
-        alt="MiniAI Logo"
-        className="w-12 h-12 object-contain"
-      />
-    </div>
-    <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to MiniAI!</h1>
-    <p className="text-gray-600">Let's get to know you better</p>
-  </div>
-</div>
+    <div>
+      {/* Header Section with MiniAI Logo */}
+      <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200 mb-8">
+        <div className="text-center">
+          <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-emerald-400 to-cyan-400">
+            <img
+              src="/miniAiElement.png"
+              alt="MiniAI Logo"
+              className="w-12 h-12 object-contain"
+            />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to MiniAI!</h1>
+          <p className="text-gray-600">Let's get to know you better</p>
+        </div>
+      </div>
 
-
+      {/* Form Section */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="name" className="block text-lg font-semibold text-gray-700 mb-2">
@@ -88,8 +90,8 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
             onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
             className="w-full px-4 py-3 border-3 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none text-lg transition-all duration-200"
             placeholder="Your age"
-            min="5"
-            max="18"
+            min={5}
+            max={18}
           />
           {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
         </div>
