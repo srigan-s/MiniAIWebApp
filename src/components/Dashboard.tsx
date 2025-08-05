@@ -71,7 +71,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
 
   if (!user) return null;
 
-  const progressToNextLevel = ((user.xp % 100) / 100) * 100;
+  const xpForCurrentLevel = (user.level - 1) * 100;
+  const xpForNextLevel = user.level * 100;
+  const progressToNextLevel = ((user.xp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
 
   return (
     <div className="space-y-8">

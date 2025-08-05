@@ -1,13 +1,14 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LogOut } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 
 interface HeaderProps {
   onBackToDashboard: () => void;
   showBackButton: boolean;
+  onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onBackToDashboard, showBackButton }) => {
+const Header: React.FC<HeaderProps> = ({ onBackToDashboard, showBackButton, onLogout }) => {
   const { user } = useUser();
 
   return (
@@ -52,6 +53,14 @@ const Header: React.FC<HeaderProps> = ({ onBackToDashboard, showBackButton }) =>
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-2xl shadow-lg">
                 {user.avatar}
               </div>
+              <button
+                onClick={onLogout}
+                className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all duration-200 hover:scale-105 shadow-lg"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="font-semibold">Logout</span>
+              </button>
             </div>
           )}
         </div>

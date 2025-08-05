@@ -10,7 +10,8 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
   const [formData, setFormData] = useState({
     name: initialData.name || '',
     age: initialData.age || '',
-    email: initialData.email || ''
+    email: initialData.email || '',
+    password: ''
   });
 
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -30,6 +31,10 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
       newErrors.email = 'Please enter a valid email';
     }
     
+    if (!formData.password || formData.password.length < 4) {
+      newErrors.password = 'Password must be at least 4 characters';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -40,7 +45,8 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
       onNext({
         name: formData.name,
         age: Number(formData.age),
-        email: formData.email
+        email: formData.email,
+        password: formData.password
       });
     }
   };
@@ -122,6 +128,22 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
               placeholder="your.email@example.com"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-lg font-semibold text-gray-700 mb-2">
+              Create a password 🔒
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={formData.password}
+              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+              className="w-full px-4 py-3 border-3 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none text-lg transition-all duration-200"
+              placeholder="Enter a password"
+              minLength={4}
+            />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
 
           <button

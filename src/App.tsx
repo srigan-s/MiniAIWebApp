@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { User, GameState } from './types';
+import { User } from './types';
 import { UserProvider } from './contexts/UserContext';
 import { GameProvider } from './contexts/GameContext';
 import OnboardingFlow from './components/OnboardingFlow';
+import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import LessonModule from './components/LessonModule';
 import MiniGame from './components/MiniGame';
 import Header from './components/Header';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'onboarding' | 'dashboard' | 'lesson' | 'game'>('onboarding');
+  const [currentView, setCurrentView] = useState<'login' | 'onboarding' | 'dashboard' | 'lesson' | 'game'>('login');
   const [currentLesson, setCurrentLesson] = useState<number | null>(null);
   const [currentGame, setCurrentGame] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -21,6 +22,30 @@ function App() {
       setCurrentView('dashboard');
     }
   }, []);
+
+  const handleLogin = (email: string, password: string) => {
+    const savedUser = localStorage.getItem('aiLearningUser');
+    if (savedUser) {
+      const userData = JSON.parse(savedUser);
+      if (userData.email === email && userData.password === password) {
+        setUser(userData);
+        setCurrentView('dashboard');
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCurrentView('login');
+    setCurrentLesson(null);
+    setCurrentGame(null);
+  };
+
+  const handleGoToSignup = () => {
+    setCurrentView('onboarding');
+  };
 
   const handleOnboardingComplete = (userData: User) => {
     setUser(userData);
@@ -44,7 +69,18 @@ function App() {
     setCurrentGame(null);
   };
 
-  if (!user && currentView === 'onboarding') {
+  if (currentView === 'login') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
+        <LoginForm 
+          onLogin={handleLogin}
+          onGoToSignup={handleGoToSignup}
+        />
+      </div>
+    );
+  }
+
+  if (currentView === 'onboarding') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
         <OnboardingFlow onComplete={handleOnboardingComplete} />
@@ -56,7 +92,7 @@ function App() {
     <UserProvider initialUser={user}>
       <GameProvider>
         <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
-          <Header onBackToDashboard={handleBackToDashboard} showBackButton={currentView !== 'dashboard'} />
+          <Header onBackToDashboard={handleBackToDashboard} showBackButton={currentView !== 'dashboard'} onLogout={handleLogout} />
           
           <main className="container mx-auto px-4 py-8">
             {currentView === 'dashboard' && (
