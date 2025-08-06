@@ -3,6 +3,9 @@ import { useUser } from '../contexts/UserContext';
 import WhatIsAI from './lessons/WhatIsAI';
 import AIvsHuman from './lessons/AIvsHuman';
 import AIInRealLife from './lessons/AIInRealLife';
+import NeuralNetworks from './lessons/NeuralNetworks';
+import ComputerVision from './lessons/ComputerVision';
+import AIBias from './lessons/AIBias';
 
 interface LessonModuleProps {
   lessonId: number;
@@ -34,6 +37,12 @@ const LessonModule: React.FC<LessonModuleProps> = ({ lessonId, onComplete }) => 
         return <AIvsHuman onComplete={() => handleLessonComplete(30)} />;
       case 3:
         return <AIInRealLife onComplete={() => handleLessonComplete(35)} />;
+      case 4:
+        return <NeuralNetworks onComplete={() => handleLessonComplete(45)} />;
+      case 5:
+        return <ComputerVision onComplete={() => handleLessonComplete(50)} />;
+      case 6:
+        return <AIBias onComplete={() => handleLessonComplete(55)} />;
       default:
         return <div>Lesson not found</div>;
     }

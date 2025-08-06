@@ -3,6 +3,9 @@ import { useUser } from '../contexts/UserContext';
 import RobotTraining from './games/RobotTraining';
 import DataSorting from './games/DataSorting';
 import QuizBattle from './games/QuizBattle';
+import NeuralNetworkBuilder from './games/NeuralNetworkBuilder';
+import ImageClassifier from './games/ImageClassifier';
+import BiasDetector from './games/BiasDetector';
 
 interface MiniGameProps {
   gameId: string;
@@ -29,6 +32,12 @@ const MiniGame: React.FC<MiniGameProps> = ({ gameId, onComplete }) => {
         return <DataSorting onComplete={() => handleGameComplete(35)} />;
       case 'quiz-battle':
         return <QuizBattle onComplete={() => handleGameComplete(50)} />;
+      case 'neural-network-builder':
+        return <NeuralNetworkBuilder onComplete={() => handleGameComplete(60)} />;
+      case 'image-classifier':
+        return <ImageClassifier onComplete={() => handleGameComplete(55)} />;
+      case 'bias-detector':
+        return <BiasDetector onComplete={() => handleGameComplete(65)} />;
       default:
         return <div>Game not found</div>;
     }

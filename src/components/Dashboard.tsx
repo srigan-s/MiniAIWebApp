@@ -36,6 +36,30 @@ const lessons = [
     type: "matching" as const,
     xpReward: 35,
     icon: "🌟"
+  },
+  {
+    id: 4,
+    title: "Neural Networks",
+    description: "Discover how AI learns like a brain with connected neurons!",
+    type: "animation-quiz" as const,
+    xpReward: 45,
+    icon: "🧬"
+  },
+  {
+    id: 5,
+    title: "Computer Vision",
+    description: "Learn how AI can see and understand images!",
+    type: "spot-difference" as const,
+    xpReward: 50,
+    icon: "👁️"
+  },
+  {
+    id: 6,
+    title: "AI Bias & Fairness",
+    description: "Understand why AI needs to be fair for everyone!",
+    type: "matching" as const,
+    xpReward: 55,
+    icon: "⚖️"
   }
 ];
 
@@ -63,6 +87,30 @@ const games = [
     type: "quiz-battle" as const,
     xpReward: 50,
     icon: "⚡"
+  },
+  {
+    id: "neural-network-builder",
+    title: "Build a Neural Network",
+    description: "Connect neurons to create your own AI brain!",
+    type: "neural-network-builder" as const,
+    xpReward: 60,
+    icon: "🔗"
+  },
+  {
+    id: "image-classifier",
+    title: "Image Classifier",
+    description: "Train AI to recognize different objects in pictures!",
+    type: "image-classifier" as const,
+    xpReward: 55,
+    icon: "🖼️"
+  },
+  {
+    id: "bias-detector",
+    title: "Bias Detective",
+    description: "Find and fix unfair decisions in AI systems!",
+    type: "bias-detector" as const,
+    xpReward: 65,
+    icon: "🕵️"
   }
 ];
 
@@ -71,9 +119,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
 
   if (!user) return null;
 
-  const xpForCurrentLevel = (user.level - 1) * 100;
-  const xpForNextLevel = user.level * 100;
-  const progressToNextLevel = ((user.xp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
+  // Calculate progress based on completed activities
+  const totalActivities = lessons.length + games.length;
+  const completedActivities = user.completedLessons.length + user.completedGames.length;
+  const progressPercentage = totalActivities > 0 ? (completedActivities / totalActivities) * 100 : 0;
 
   return (
     <div className="space-y-8">
@@ -110,7 +159,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
         </div>
 
         <div className="mt-6">
-          <ProgressBar progress={progressToNextLevel} />
+          <ProgressBar progress={progressPercentage} totalActivities={totalActivities} completedActivities={completedActivities} />
         </div>
       </div>
 
@@ -121,7 +170,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
           <h2 className="text-3xl font-bold text-gray-800">Learning Adventures</h2>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {lessons.map((lesson) => (
             <LessonCard
               key={lesson.id}
@@ -140,7 +189,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
           <h2 className="text-3xl font-bold text-gray-800">AI Challenge Games</h2>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {games.map((game) => (
             <GameCard
               key={game.id}
