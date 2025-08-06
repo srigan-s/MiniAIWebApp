@@ -71,7 +71,7 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
               <div className="absolute inset-0 rounded-full border-4 border-[#A3D9A5] animate-spin-fast"></div>
               {/* Logo */}
               <img
-                src="/miniAiElement.png"
+                src="images/miniAiElement.png"
                 alt="MiniAI Logo"
                 className="relative w-20 h-20 object-contain"
               />
