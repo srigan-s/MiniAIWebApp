@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ onBackToDashboard, showBackButton, onLo
 
             <div className="flex items-center space-x-2">
               <div className="p-2 bg-emerald-100 rounded-xl">
-                <img src="/miniAiElement.png" alt="Brain Icon" className="w-13.5 h-12" />
+                <img src="/images/miniAiElement.png" alt="Brain Icon" className="w-13.5 h-12" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">MiniAI</h1>
