@@ -43,7 +43,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
             <div className="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center rounded-full bg-[#E6F2E9]">
               <div className="absolute inset-0 rounded-full border-4 border-[#A3D9A5] animate-spin-fast"></div>
               <img
-                src="/miniAiElement.png"
+                src="/images/miniAiElement.png"
                 alt="MiniAI Logo"
                 className="relative w-20 h-20 object-contain"
               />
