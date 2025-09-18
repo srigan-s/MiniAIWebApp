@@ -1,4 +1,4 @@
-# 📘 MiniAI‑Learn
+# 📘 MiniAI‑Learn 
 
 **MiniAI‑Learn** is a web-based educational game that introduces kids (ages 6–12) to fundamental AI concepts through fun, interactive challenges and bite‑sized lessons.
 
