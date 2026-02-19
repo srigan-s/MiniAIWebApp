@@ -55,7 +55,4 @@ VITE_FIREBASE_APP_ID=your_app_id
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 ```
 
-In Firebase Console:
-- Enable **Authentication → Sign-in method → Google**.
-- Enable **Multi-factor authentication** and allow **SMS** as a second factor.
-- Add your local/dev domain to authorized domains.
+
