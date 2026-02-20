@@ -53,15 +53,4 @@ VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
 VITE_FIREBASE_APP_ID=your_app_id
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-```
 
-In Firebase Console:
-- Enable **Authentication → Sign-in method → Google**.
-- Enable **Multi-factor authentication** and allow **SMS** as a second factor.
-- Add your local/dev domain to authorized domains.
-- Since you host on Netlify, add **miniai-learn.netlify.app** to Firebase Authentication → Settings → Authorized domains.
-
-Troubleshooting Google sign-in errors:
-- Add domains as hostnames only (no `https://`).
-- Common required hosts: `localhost`, `127.0.0.1`, and `miniai-learn.netlify.app`.
-- If you see `auth/unauthorized-domain`, the current host is missing from Authorized domains.
