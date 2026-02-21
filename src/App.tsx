@@ -19,6 +19,20 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    const savedUser = localStorage.getItem('aiLearningUser');
+    const isLoggedIn = localStorage.getItem('aiLearningLoggedIn') === 'true';
+
+    if (savedUser && isLoggedIn) {
+      setUser(JSON.parse(savedUser) as User);
+      setCurrentView('dashboard');
+      return;
+    }
+
+    setCurrentView('login');
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('aiLearningLoggedIn');
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
       if (!firebaseUser) {
         setUser(null);
@@ -62,6 +76,13 @@ function App() {
   const handleOnboardingComplete = (userData: User) => {
     setUser(userData);
     localStorage.setItem('aiLearningUser', JSON.stringify(userData));
+    localStorage.setItem('aiLearningLoggedIn', 'true');
+    setCurrentView('dashboard');
+  };
+
+  const handleLoginSuccess = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('aiLearningLoggedIn', 'true');
     setCurrentView('dashboard');
   };
 
@@ -85,6 +106,7 @@ function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
         <LoginForm
+          onLoginSuccess={handleLoginSuccess}
           onLoginSuccess={() => setCurrentView('dashboard')}
           onGoToSignup={handleGoToSignup}
         />

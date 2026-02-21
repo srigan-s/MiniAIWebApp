@@ -30,27 +30,8 @@ MiniAI‑Learn helps young learners explore artificial intelligence in an enjoya
 
 ---
 
-## 🔐 Firebase Google Login + 2FA Setup
+## 🔐 Login
 
-Yes — you need Firebase web app config values (including `VITE_FIREBASE_API_KEY`) for this login flow.
-
-> Note: Firebase Web API keys are **not secret credentials**. They identify your Firebase project in client apps. Security comes from Firebase Auth rules, authorized domains, and MFA—not from hiding this key.
-
-This repo now includes the MiniAI Firebase project values as defaults in the app, so it can run without extra setup.
-
-If you want to override them (recommended for your own Firebase project), create a `.env` file in the project root and map your Firebase console values like this:
-- `apiKey` → `VITE_FIREBASE_API_KEY`
-- `authDomain` → `VITE_FIREBASE_AUTH_DOMAIN`
-- `projectId` → `VITE_FIREBASE_PROJECT_ID`
-- `appId` → `VITE_FIREBASE_APP_ID`
-- `messagingSenderId` → `VITE_FIREBASE_MESSAGING_SENDER_ID`
-
-`storageBucket` and `measurementId` are optional for this auth-only integration.
-
-```bash
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_APP_ID=your_app_id
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+MiniAI-Learn currently uses local account login (email + password) stored in browser localStorage.
+Create an account from the sign-up flow, then log in with the same credentials.
 
