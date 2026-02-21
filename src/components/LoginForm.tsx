@@ -82,119 +82,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
     }
 
     onLoginSuccess(user);
-    try {
-      const result = await signInWithGoogle();
-      const enrolledFactors = result.user.multiFactor.enrolledFactors;
-
-      if (!enrolledFactors.length) {
-        setSetupStep('phone');
-        return;
-      }
-
-      onLoginSuccess();
-    } catch (signInError: unknown) {
-      const firebaseError = signInError as FirebaseErrorDetails;
-
-      if (firebaseError.code === 'auth/multi-factor-auth-required') {
-        try {
-          const resolver = getMultiFactorResolver(signInError);
-          const firstPhoneFactor = resolver.hints[0];
-
-          if (!firstPhoneFactor?.uid) {
-            setError('No SMS second factor is available for this account.');
-            return;
-          }
-
-          const smsVerificationId = await startMfaSignIn(
-            resolver,
-            firstPhoneFactor.uid,
-            'recaptcha-container',
-          );
-
-          setVerificationId(smsVerificationId);
-          setSetupStep('otp');
-
-          const verificationCode = window.prompt(
-            'Enter the SMS code sent to your phone',
-          );
-
-          if (!verificationCode) {
-            setError('Second factor verification was cancelled.');
-            return;
-          }
-
-          await completeMfaSignIn(
-            resolver,
-            smsVerificationId,
-            verificationCode,
-          );
-
-          onLoginSuccess();
-        } catch (mfaError: unknown) {
-          const detailedMfaError = mfaError as FirebaseErrorDetails;
-          setError(
-            `Unable to complete two-factor verification. ${detailedMfaError.message ?? ''}`.trim(),
-          );
-        }
-      } else {
-        setError(getSignInErrorMessage(firebaseError));
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEnrollPhone = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!auth.currentUser) {
-      setError('Please sign in with Google first.');
-      return;
-    }
-
-    try {
-      const session = await auth.currentUser.multiFactor.getSession();
-
-      const smsVerificationId = await startPhoneEnrollment(
-        phoneNumber,
-        session,
-        'recaptcha-container',
-      );
-
-      setVerificationId(smsVerificationId);
-      setSetupStep('otp');
-    } catch (enrollError: unknown) {
-      const detailedEnrollError = enrollError as FirebaseErrorDetails;
-      setError(
-        `Could not send verification code. Confirm your phone number format (e.g. +15551234567). ${detailedEnrollError.message ?? ''}`.trim(),
-      );
-    }
-  };
-
-  const handleVerifyCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!verificationId) {
-      setError('Missing verification session. Please restart sign in.');
-      return;
-    }
-
-    try {
-      await finalizePhoneEnrollment(
-        verificationId,
-        phoneCode,
-        'Primary phone',
-      );
-
-      onLoginSuccess();
-    } catch (verifyError: unknown) {
-      const detailedVerifyError = verifyError as FirebaseErrorDetails;
-      setError(
-        `Invalid verification code. ${detailedVerifyError.message ?? ''}`.trim(),
-      );
-    }
   };
 
   return (
@@ -212,13 +99,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h1>
             <p className="text-gray-600">Log in with your MiniAI account to continue.</p>
-
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Welcome Back!
-            </h1>
-            <p className="text-gray-600">
-              Sign in with Google and complete 2FA to continue.
-            </p>
+            <p className="text-xs text-gray-500 mt-2">Google/Firebase sign-in has been removed from this build.</p>
           </div>
         </div>
 
@@ -241,38 +122,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none"
                 placeholder="your.email@example.com"
-          {setupStep === 'none' && (
-            <>
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Signing In...' : 'Continue with Google 🔐'}
-              </button>
-
-              <p className="text-xs text-gray-500 mt-3">
-                If this fails, verify Firebase Authorized domains include this host (for production: miniai-learn.netlify.app).
-              </p>
-            </>
-          )}
-
-          {setupStep === 'phone' && (
-            <form onSubmit={handleEnrollPhone} className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-800">
-                Set up Two-Factor Authentication
-              </h2>
-              <p className="text-gray-600">
-                Enter your phone number to receive your one-time verification code.
-              </p>
-              <input
-                type="tel"
-                required
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+15551234567"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none"
               />
               <button
                 type="submit"
