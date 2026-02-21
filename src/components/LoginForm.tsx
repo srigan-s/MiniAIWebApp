@@ -14,6 +14,57 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+import {
+  getAuth,
+  getMultiFactorResolver,
+  completeMfaSignIn,
+  finalizePhoneEnrollment,
+  signInWithGoogle,
+  startMfaSignIn,
+  startPhoneEnrollment,
+} from '../lib/firebase';
+
+interface LoginFormProps {
+  onLoginSuccess: () => void;
+  onGoToSignup: () => void;
+}
+
+interface FirebaseErrorDetails {
+  code?: string;
+  message?: string;
+}
+
+const auth = getAuth();
+
+const getSignInErrorMessage = (error: FirebaseErrorDetails) => {
+  switch (error.code) {
+    case 'auth/unauthorized-domain':
+      return 'This domain is not authorized in Firebase Auth. Add this exact host in Firebase Authentication → Settings → Authorized domains.';
+    case 'auth/operation-not-allowed':
+      return 'Google sign-in is not enabled. Enable Google in Firebase Authentication → Sign-in method.';
+    case 'auth/popup-blocked':
+      return 'Google popup was blocked by the browser. Allow popups for this site and try again.';
+    case 'auth/popup-closed-by-user':
+      return 'Google sign-in popup was closed before completing sign-in.';
+    case 'auth/cancelled-popup-request':
+      return 'Google sign-in was interrupted. Please try again.';
+    default:
+      return `Google sign-in failed: ${error.message ?? 'Unknown Firebase error.'}`;
+  }
+};
+
+const LoginForm: React.FC<LoginFormProps> = ({
+  onLoginSuccess,
+  onGoToSignup,
+}) => {
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneCode, setPhoneCode] = useState('');
+  const [verificationId, setVerificationId] = useState('');
+  const [setupStep, setSetupStep] = useState<'none' | 'phone' | 'otp'>('none');
+
+  const handleGoogleSignIn = async () => {
     setError('');
 
     const savedUser = localStorage.getItem('aiLearningUser');
@@ -72,7 +123,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none"
                 placeholder="your.email@example.com"
               />
-            </div>
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 rounded-xl font-semibold"
+              >
+                Send Verification Code
+              </button>
+            </form>
+          )}
 
             <div>
               <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
@@ -94,9 +152,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
               Log In
             </button>
           </form>
+          {setupStep === 'otp' && (
+            <form onSubmit={handleVerifyCode} className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-800">
+                Enter verification code
+              </h2>
+              <input
+                type="text"
+                required
+                value={phoneCode}
+                onChange={(e) => setPhoneCode(e.target.value)}
+                placeholder="123456"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 rounded-xl font-semibold"
+              >
+                Verify & Continue
+              </button>
+            </form>
+          )}
+
+          <div id="recaptcha-container" />
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600 mb-4">Don't have an account yet?</p>
+            <p className="text-gray-600 mb-4">
+              Don't have an account yet?
+            </p>
             <button
               onClick={onGoToSignup}
               className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors duration-200"

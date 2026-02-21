@@ -8,6 +8,9 @@ import Dashboard from './components/Dashboard';
 import LessonModule from './components/LessonModule';
 import MiniGame from './components/MiniGame';
 import Header from './components/Header';
+import { getAuth } from './lib/firebase';
+
+const auth = getAuth();
 
 function App() {
   const [currentView, setCurrentView] = useState<'login' | 'onboarding' | 'dashboard' | 'lesson' | 'game'>('login');
