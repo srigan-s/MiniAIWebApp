@@ -39,7 +39,10 @@ const getSignInErrorMessage = (error: FirebaseErrorDetails) => {
   }
 };
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) => {
+const LoginForm: React.FC<LoginFormProps> = ({
+  onLoginSuccess,
+  onGoToSignup,
+}) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -124,6 +127,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
 
     try {
       const session = await auth.currentUser.multiFactor.getSession();
+
       const smsVerificationId = await startPhoneEnrollment(
         phoneNumber,
         session,
@@ -178,6 +182,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
                 className="relative w-20 h-20 object-contain"
               />
             </div>
+
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
               Welcome Back!
             </h1>
@@ -207,7 +212,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
               </button>
 
               <p className="text-xs text-gray-500 mt-3">
-                If this fails, verify Firebase Authorized domains include this host.
+                If this fails, verify Firebase Authorized domains include this host (for production: miniai-learn.netlify.app).
               </p>
             </>
           )}
