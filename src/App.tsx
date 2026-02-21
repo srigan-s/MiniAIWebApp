@@ -8,6 +8,9 @@ import Dashboard from './components/Dashboard';
 import LessonModule from './components/LessonModule';
 import MiniGame from './components/MiniGame';
 import Header from './components/Header';
+import { getAuth } from './lib/firebase';
+
+const auth = getAuth();
 
 function App() {
   const [currentView, setCurrentView] = useState<'login' | 'onboarding' | 'dashboard' | 'lesson' | 'game'>('login');
@@ -44,6 +47,14 @@ function App() {
     setUser(userData);
     localStorage.setItem('aiLearningUser', JSON.stringify(userData));
     localStorage.setItem('aiLearningLoggedIn', 'true');
+
+    setCurrentView('dashboard');
+  };
+
+  const handleLoginSuccess = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('aiLearningLoggedIn', 'true');
+ main
     setCurrentView('dashboard');
   };
 
@@ -86,7 +97,11 @@ function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
         <LoginForm
+
           onLogin={handleLogin}
+
+          onLoginSuccess={handleLoginSuccess}
+ main
           onGoToSignup={handleGoToSignup}
         />
       </div>
