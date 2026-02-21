@@ -39,7 +39,10 @@ const getSignInErrorMessage = (error: FirebaseErrorDetails) => {
   }
 };
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) => {
+const LoginForm: React.FC<LoginFormProps> = ({
+  onLoginSuccess,
+  onGoToSignup,
+}) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -83,18 +86,27 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
           setVerificationId(smsVerificationId);
           setSetupStep('otp');
 
-          const verificationCode = window.prompt('Enter the SMS code sent to your phone');
+          const verificationCode = window.prompt(
+            'Enter the SMS code sent to your phone',
+          );
 
           if (!verificationCode) {
             setError('Second factor verification was cancelled.');
             return;
           }
 
-          await completeMfaSignIn(resolver, smsVerificationId, verificationCode);
+          await completeMfaSignIn(
+            resolver,
+            smsVerificationId,
+            verificationCode,
+          );
+
           onLoginSuccess();
         } catch (mfaError: unknown) {
           const detailedMfaError = mfaError as FirebaseErrorDetails;
-          setError(`Unable to complete two-factor verification. ${detailedMfaError.message ?? ''}`.trim());
+          setError(
+            `Unable to complete two-factor verification. ${detailedMfaError.message ?? ''}`.trim(),
+          );
         }
       } else {
         setError(getSignInErrorMessage(firebaseError));
@@ -115,7 +127,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
 
     try {
       const session = await auth.currentUser.multiFactor.getSession();
-      const smsVerificationId = await startPhoneEnrollment(phoneNumber, session, 'recaptcha-container');
+
+      const smsVerificationId = await startPhoneEnrollment(
+        phoneNumber,
+        session,
+        'recaptcha-container',
+      );
+
       setVerificationId(smsVerificationId);
       setSetupStep('otp');
     } catch (enrollError: unknown) {
@@ -136,11 +154,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
     }
 
     try {
-      await finalizePhoneEnrollment(verificationId, phoneCode, 'Primary phone');
+      await finalizePhoneEnrollment(
+        verificationId,
+        phoneCode,
+        'Primary phone',
+      );
+
       onLoginSuccess();
     } catch (verifyError: unknown) {
       const detailedVerifyError = verifyError as FirebaseErrorDetails;
-      setError(`Invalid verification code. ${detailedVerifyError.message ?? ''}`.trim());
+      setError(
+        `Invalid verification code. ${detailedVerifyError.message ?? ''}`.trim(),
+      );
     }
   };
 
@@ -157,8 +182,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
                 className="relative w-20 h-20 object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h1>
-            <p className="text-gray-600">Sign in with Google and complete 2FA to continue.</p>
+
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Welcome Back!
+            </h1>
+            <p className="text-gray-600">
+              Sign in with Google and complete 2FA to continue.
+            </p>
           </div>
         </div>
 
@@ -172,24 +202,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
 
           {setupStep === 'none' && (
             <>
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Signing In...' : 'Continue with Google 🔐'}
-            </button>
-            <p className="text-xs text-gray-500 mt-3">
-              If this fails, verify Firebase Authorized domains include this host (for production: miniai-learn.netlify.app).
-            </p>
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Signing In...' : 'Continue with Google 🔐'}
+              </button>
+
+              <p className="text-xs text-gray-500 mt-3">
+                If this fails, verify Firebase Authorized domains include this host (for production: miniai-learn.netlify.app).
+              </p>
             </>
           )}
 
           {setupStep === 'phone' && (
             <form onSubmit={handleEnrollPhone} className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-800">Set up Two-Factor Authentication</h2>
-              <p className="text-gray-600">Enter your phone number to receive your one-time verification code.</p>
+              <h2 className="text-xl font-bold text-gray-800">
+                Set up Two-Factor Authentication
+              </h2>
+              <p className="text-gray-600">
+                Enter your phone number to receive your one-time verification code.
+              </p>
               <input
                 type="tel"
                 required
@@ -209,7 +244,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
 
           {setupStep === 'otp' && (
             <form onSubmit={handleVerifyCode} className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-800">Enter verification code</h2>
+              <h2 className="text-xl font-bold text-gray-800">
+                Enter verification code
+              </h2>
               <input
                 type="text"
                 required
@@ -230,7 +267,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) =
           <div id="recaptcha-container" />
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600 mb-4">Don't have an account yet?</p>
+            <p className="text-gray-600 mb-4">
+              Don't have an account yet?
+            </p>
             <button
               onClick={onGoToSignup}
               className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors duration-200"
