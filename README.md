@@ -27,3 +27,11 @@ MiniAI‑Learn helps young learners explore artificial intelligence in an enjoya
 - **Frontend**: HTML5, CSS3, React (Typescript)
 - **Virtual AI engine**: A lightweight simulation layer (no external API calls) to mimic AI responses and models
 - **Hosting**: Deployed via **Netlify** for fast, scalable hosting
+
+---
+
+## 🔐 Login
+
+MiniAI-Learn currently uses local account login (email + password) stored in browser localStorage.
+Create an account from the sign-up flow, then log in with the same credentials.
+

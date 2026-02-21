@@ -8,6 +8,9 @@ import Dashboard from './components/Dashboard';
 import LessonModule from './components/LessonModule';
 import MiniGame from './components/MiniGame';
 import Header from './components/Header';
+import { getAuth } from './lib/firebase';
+
+const auth = getAuth();
 
 function App() {
   const [currentView, setCurrentView] = useState<'login' | 'onboarding' | 'dashboard' | 'lesson' | 'game'>('login');
@@ -17,26 +20,19 @@ function App() {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('aiLearningUser');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const isLoggedIn = localStorage.getItem('aiLearningLoggedIn') === 'true';
+
+    if (savedUser && isLoggedIn) {
+      setUser(JSON.parse(savedUser) as User);
       setCurrentView('dashboard');
+      return;
     }
+
+    setCurrentView('login');
   }, []);
 
-  const handleLogin = (email: string, password: string) => {
-    const savedUser = localStorage.getItem('aiLearningUser');
-    if (savedUser) {
-      const userData = JSON.parse(savedUser);
-      if (userData.email === email && userData.password === password) {
-        setUser(userData);
-        setCurrentView('dashboard');
-        return true;
-      }
-    }
-    return false;
-  };
-
   const handleLogout = () => {
+    localStorage.removeItem('aiLearningLoggedIn');
     setUser(null);
     setCurrentView('login');
     setCurrentLesson(null);
@@ -50,7 +46,35 @@ function App() {
   const handleOnboardingComplete = (userData: User) => {
     setUser(userData);
     localStorage.setItem('aiLearningUser', JSON.stringify(userData));
+    localStorage.setItem('aiLearningLoggedIn', 'true');
+
     setCurrentView('dashboard');
+  };
+
+  const handleLoginSuccess = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('aiLearningLoggedIn', 'true');
+ main
+    setCurrentView('dashboard');
+  };
+
+  const handleLogin = (email: string, password: string) => {
+    const savedUser = localStorage.getItem('aiLearningUser');
+
+    if (!savedUser) {
+      return false;
+    }
+
+    const userData = JSON.parse(savedUser) as User;
+
+    if (userData.email !== email || userData.password !== password) {
+      return false;
+    }
+
+    setUser(userData);
+    localStorage.setItem('aiLearningLoggedIn', 'true');
+    setCurrentView('dashboard');
+    return true;
   };
 
   const handleStartLesson = (lessonId: number) => {
@@ -72,8 +96,12 @@ function App() {
   if (currentView === 'login') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
-        <LoginForm 
+        <LoginForm
+
           onLogin={handleLogin}
+
+          onLoginSuccess={handleLoginSuccess}
+ main
           onGoToSignup={handleGoToSignup}
         />
       </div>
@@ -93,24 +121,24 @@ function App() {
       <GameProvider>
         <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
           <Header onBackToDashboard={handleBackToDashboard} showBackButton={currentView !== 'dashboard'} onLogout={handleLogout} />
-          
+
           <main className="container mx-auto px-4 py-8">
             {currentView === 'dashboard' && (
-              <Dashboard 
+              <Dashboard
                 onStartLesson={handleStartLesson}
                 onStartGame={handleStartGame}
               />
             )}
-            
+
             {currentView === 'lesson' && currentLesson !== null && (
-              <LessonModule 
+              <LessonModule
                 lessonId={currentLesson}
                 onComplete={handleBackToDashboard}
               />
             )}
-            
+
             {currentView === 'game' && currentGame && (
-              <MiniGame 
+              <MiniGame
                 gameId={currentGame}
                 onComplete={handleBackToDashboard}
               />
