@@ -9,6 +9,7 @@ const BiasDetector: React.FC<BiasDetectorProps> = ({ onComplete }) => {
   const [currentCase, setCurrentCase] = useState(0);
   const [detectedBiases, setDetectedBiases] = useState<{[key: string]: boolean}>({});
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const cases = [
     {
@@ -63,9 +64,15 @@ const BiasDetector: React.FC<BiasDetectorProps> = ({ onComplete }) => {
       setCurrentCase(currentCase + 1);
     } else {
       setShowResults(true);
-      setTimeout(() => {
-        onComplete();
-      }, 3000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            onComplete();
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -81,6 +88,9 @@ const BiasDetector: React.FC<BiasDetectorProps> = ({ onComplete }) => {
         </p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+65 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );

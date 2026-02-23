@@ -9,6 +9,7 @@ const NeuralNetworks: React.FC<NeuralNetworksProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [connections, setConnections] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const steps = [
     {
@@ -69,9 +70,15 @@ const NeuralNetworks: React.FC<NeuralNetworksProps> = ({ onComplete }) => {
       setCurrentStep(currentStep + 1);
     } else {
       setShowResults(true);
-      setTimeout(() => {
-        onComplete();
-      }, 3000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            onComplete();
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -83,6 +90,9 @@ const NeuralNetworks: React.FC<NeuralNetworksProps> = ({ onComplete }) => {
         <p className="text-xl text-gray-600 mb-6">You made {connections.length} neural connections!</p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+45 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );

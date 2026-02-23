@@ -9,6 +9,7 @@ const ComputerVision: React.FC<ComputerVisionProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [identifiedObjects, setIdentifiedObjects] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const steps = [
     {
@@ -69,9 +70,15 @@ const ComputerVision: React.FC<ComputerVisionProps> = ({ onComplete }) => {
       setCurrentStep(currentStep + 1);
     } else {
       setShowResults(true);
-      setTimeout(() => {
-        onComplete();
-      }, 3000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            onComplete();
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -83,6 +90,9 @@ const ComputerVision: React.FC<ComputerVisionProps> = ({ onComplete }) => {
         <p className="text-xl text-gray-600 mb-6">You identified {identifiedObjects.length} objects!</p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+50 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );
