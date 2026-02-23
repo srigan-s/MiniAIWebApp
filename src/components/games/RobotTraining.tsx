@@ -9,6 +9,7 @@ const RobotTraining: React.FC<RobotTrainingProps> = ({ onComplete }) => {
   const [currentScenario, setCurrentScenario] = useState(0);
   const [robotDecisions, setRobotDecisions] = useState<{[key: number]: string}>({});
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const scenarios = [
     {
@@ -55,9 +56,15 @@ const RobotTraining: React.FC<RobotTrainingProps> = ({ onComplete }) => {
       setCurrentScenario(currentScenario + 1);
     } else {
       setShowResults(true);
-      setTimeout(() => {
-        onComplete();
-      }, 3000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            onComplete();
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -80,6 +87,9 @@ const RobotTraining: React.FC<RobotTrainingProps> = ({ onComplete }) => {
         </p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+40 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );

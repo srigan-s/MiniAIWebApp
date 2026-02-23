@@ -9,6 +9,7 @@ const WhatIsAI: React.FC<WhatIsAIProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<{[key: number]: string}>({});
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const steps = [
     {
@@ -63,9 +64,16 @@ const WhatIsAI: React.FC<WhatIsAIProps> = ({ onComplete }) => {
     } else {
       // Show results
       setShowResults(true);
-      setTimeout(() => {
-        onComplete();
-      }, 3000);
+      setCountdown(3);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            onComplete();
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -77,6 +85,9 @@ const WhatIsAI: React.FC<WhatIsAIProps> = ({ onComplete }) => {
         <p className="text-xl text-gray-600 mb-6">Great job learning about AI!</p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+25 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );

@@ -9,6 +9,7 @@ const AIInRealLife: React.FC<AIInRealLifeProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [matches, setMatches] = useState<{[key: string]: string}>({});
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const steps = [
     {
@@ -59,9 +60,15 @@ const AIInRealLife: React.FC<AIInRealLifeProps> = ({ onComplete }) => {
       setCurrentStep(currentStep + 1);
     } else {
       setShowResults(true);
-      setTimeout(() => {
-        onComplete();
-      }, 3000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            onComplete();
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -73,6 +80,9 @@ const AIInRealLife: React.FC<AIInRealLifeProps> = ({ onComplete }) => {
         <p className="text-xl text-gray-600 mb-6">You matched {Object.keys(matches).length} AI examples!</p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+35 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );

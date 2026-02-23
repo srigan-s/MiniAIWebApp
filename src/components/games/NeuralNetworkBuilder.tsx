@@ -10,6 +10,7 @@ const NeuralNetworkBuilder: React.FC<NeuralNetworkBuilderProps> = ({ onComplete 
   const [connections, setConnections] = useState<string[]>([]);
   const [trainedNetworks, setTrainedNetworks] = useState<number>(0);
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const levels = [
     {
@@ -47,9 +48,15 @@ const NeuralNetworkBuilder: React.FC<NeuralNetworkBuilderProps> = ({ onComplete 
       } else {
         setTimeout(() => {
           setShowResults(true);
-          setTimeout(() => {
-            onComplete();
-          }, 3000);
+          const countdownInterval = setInterval(() => {
+            setCountdown((prev) => {
+              if (prev === 1) {
+                clearInterval(countdownInterval);
+                onComplete();
+              }
+              return prev - 1;
+            });
+          }, 1000);
         }, 2000);
       }
     }
@@ -65,6 +72,9 @@ const NeuralNetworkBuilder: React.FC<NeuralNetworkBuilderProps> = ({ onComplete 
         </p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+60 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );

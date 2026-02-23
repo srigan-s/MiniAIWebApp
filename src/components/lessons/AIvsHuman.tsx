@@ -9,6 +9,7 @@ const AIvsHuman: React.FC<AIvsHumanProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [foundDifferences, setFoundDifferences] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [countdown, setCountdown] = useState(3);
 
   const differences = [
     { id: 'speed', position: { top: '20%', left: '25%' }, description: 'AI processes faster' },
@@ -76,9 +77,15 @@ const AIvsHuman: React.FC<AIvsHumanProps> = ({ onComplete }) => {
       setCurrentStep(currentStep + 1);
     } else {
       setShowResults(true);
-      setTimeout(() => {
-        onComplete();
-      }, 3000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            onComplete();
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
   };
 
@@ -90,6 +97,9 @@ const AIvsHuman: React.FC<AIvsHumanProps> = ({ onComplete }) => {
         <p className="text-xl text-gray-600 mb-6">You found {foundDifferences.length} differences!</p>
         <div className="bg-green-100 rounded-2xl p-4">
           <p className="text-green-700 font-semibold">+30 XP Earned!</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4 mt-4">
+          <p className="text-green-700 font-semibold">Redirecting in {countdown}...</p>
         </div>
       </div>
     );
