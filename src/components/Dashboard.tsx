@@ -63,6 +63,8 @@ const lessons = [
   }
 ];
 
+const lessonSequence = [1, 4, 5, 2, 3, 6];
+
 const games = [
   {
     id: "robot-training",
@@ -119,6 +121,19 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
 
   if (!user) return null;
 
+  const lessonsById = new Map(lessons.map((lesson) => [lesson.id, lesson]));
+  const orderedLessons = lessonSequence
+    .map((lessonId) => lessonsById.get(lessonId))
+    .filter((lesson): lesson is (typeof lessons)[number] => Boolean(lesson));
+
+  const isLessonLocked = (lessonId: number) => {
+    const lessonIndex = lessonSequence.indexOf(lessonId);
+    if (lessonIndex <= 0) return false;
+
+    const previousLessonId = lessonSequence[lessonIndex - 1];
+    return !user.completedLessons.includes(previousLessonId);
+  };
+
   // Calculate progress based on completed activities
   const totalActivities = lessons.length + games.length;
   const completedActivities = user.completedLessons.length + user.completedGames.length;
@@ -171,14 +186,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {lessons.map((lesson) => (
-            <LessonCard
-              key={lesson.id}
-              lesson={lesson}
-              isCompleted={user.completedLessons.includes(lesson.id)}
-              onStart={() => onStartLesson(lesson.id)}
-            />
-          ))}
+          {orderedLessons.map((lesson) => {
+            const isCompleted = user.completedLessons.includes(lesson.id);
+            const isLocked = isLessonLocked(lesson.id);
+
+            return (
+              <LessonCard
+                key={lesson.id}
+                lesson={lesson}
+                isCompleted={isCompleted}
+                isLocked={isLocked}
+                onStart={() => onStartLesson(lesson.id)}
+              />
+            );
+          })}
         </div>
       </div>
 
