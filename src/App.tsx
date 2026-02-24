@@ -28,6 +28,12 @@ const FloatingBubbles = () => (
       <span className="bubble bubble-ten"></span>
       <span className="bubble bubble-eleven"></span>
       <span className="bubble bubble-twelve"></span>
+      <span className="bubble bubble-thirteen"></span>
+      <span className="bubble bubble-fourteen"></span>
+      <span className="bubble bubble-fifteen"></span>
+      <span className="bubble bubble-sixteen"></span>
+      <span className="bubble bubble-seventeen"></span>
+      <span className="bubble bubble-eighteen"></span>
 
       <span className="sparkle sparkle-one"></span>
       <span className="sparkle sparkle-two"></span>
@@ -67,18 +73,24 @@ const FloatingBubbles = () => (
         box-shadow: 0 0 24px rgba(16,185,129,0.18);
         animation: bubble-float linear infinite;
       }
-      .bubble-one { left: 4%; width: 68px; height: 68px; animation-duration: 20s; }
-      .bubble-two { left: 13%; width: 22px; height: 22px; animation-duration: 14s; animation-delay: 2s; }
-      .bubble-three { left: 22%; width: 44px; height: 44px; animation-duration: 18s; animation-delay: 5s; }
-      .bubble-four { left: 31%; width: 82px; height: 82px; animation-duration: 23s; animation-delay: 1s; }
-      .bubble-five { left: 45%; width: 30px; height: 30px; animation-duration: 15s; animation-delay: 3s; }
-      .bubble-six { left: 55%; width: 58px; height: 58px; animation-duration: 21s; animation-delay: 6s; }
-      .bubble-seven { left: 64%; width: 26px; height: 26px; animation-duration: 13s; animation-delay: 4s; }
-      .bubble-eight { left: 72%; width: 72px; height: 72px; animation-duration: 22s; animation-delay: 2.5s; }
-      .bubble-nine { left: 81%; width: 34px; height: 34px; animation-duration: 17s; animation-delay: 7s; }
-      .bubble-ten { left: 88%; width: 50px; height: 50px; animation-duration: 19s; animation-delay: 1.5s; }
-      .bubble-eleven { left: 94%; width: 24px; height: 24px; animation-duration: 12s; animation-delay: 8s; }
-      .bubble-twelve { left: 38%; width: 18px; height: 18px; animation-duration: 11s; animation-delay: 6.5s; }
+      .bubble-one { left: 3%; width: 140px; height: 140px; animation-duration: 26s; }
+      .bubble-two { left: 10%; width: 72px; height: 72px; animation-duration: 20s; animation-delay: 1.5s; }
+      .bubble-three { left: 18%; width: 108px; height: 108px; animation-duration: 24s; animation-delay: 3.5s; }
+      .bubble-four { left: 27%; width: 168px; height: 168px; animation-duration: 29s; animation-delay: 1s; }
+      .bubble-five { left: 37%; width: 92px; height: 92px; animation-duration: 22s; animation-delay: 2s; }
+      .bubble-six { left: 47%; width: 132px; height: 132px; animation-duration: 27s; animation-delay: 4.2s; }
+      .bubble-seven { left: 57%; width: 84px; height: 84px; animation-duration: 19s; animation-delay: 2.6s; }
+      .bubble-eight { left: 65%; width: 156px; height: 156px; animation-duration: 30s; animation-delay: 1.3s; }
+      .bubble-nine { left: 74%; width: 102px; height: 102px; animation-duration: 23s; animation-delay: 5.6s; }
+      .bubble-ten { left: 82%; width: 130px; height: 130px; animation-duration: 25s; animation-delay: 1.5s; }
+      .bubble-eleven { left: 90%; width: 76px; height: 76px; animation-duration: 18s; animation-delay: 7s; }
+      .bubble-twelve { left: 95%; width: 62px; height: 62px; animation-duration: 16s; animation-delay: 3s; }
+      .bubble-thirteen { left: 8%; width: 118px; height: 118px; animation-duration: 24s; animation-delay: 8s; }
+      .bubble-fourteen { left: 22%; width: 74px; height: 74px; animation-duration: 21s; animation-delay: 9s; }
+      .bubble-fifteen { left: 42%; width: 146px; height: 146px; animation-duration: 31s; animation-delay: 6s; }
+      .bubble-sixteen { left: 61%; width: 96px; height: 96px; animation-duration: 22s; animation-delay: 10s; }
+      .bubble-seventeen { left: 79%; width: 168px; height: 168px; animation-duration: 33s; animation-delay: 4.5s; }
+      .bubble-eighteen { left: 87%; width: 88px; height: 88px; animation-duration: 20s; animation-delay: 11s; }
 
       .sparkle {
         position: absolute;
