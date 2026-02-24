@@ -1,44 +1,92 @@
 import React, { useState } from 'react';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { User } from '../types';
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => boolean;
+  onLoginSuccess: (user: User) => void;
   onGoToSignup: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoToSignup }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+import {
+  getAuth,
+  getMultiFactorResolver,
+  completeMfaSignIn,
+  finalizePhoneEnrollment,
+  signInWithGoogle,
+  startMfaSignIn,
+  startPhoneEnrollment,
+} from '../lib/firebase';
+
+interface LoginFormProps {
+  onLoginSuccess: () => void;
+  onGoToSignup: () => void;
+}
+
+interface FirebaseErrorDetails {
+  code?: string;
+  message?: string;
+}
+
+const auth = getAuth();
+
+const getSignInErrorMessage = (error: FirebaseErrorDetails) => {
+  switch (error.code) {
+    case 'auth/unauthorized-domain':
+      return 'This domain is not authorized in Firebase Auth. Add this exact host in Firebase Authentication → Settings → Authorized domains.';
+    case 'auth/operation-not-allowed':
+      return 'Google sign-in is not enabled. Enable Google in Firebase Authentication → Sign-in method.';
+    case 'auth/popup-blocked':
+      return 'Google popup was blocked by the browser. Allow popups for this site and try again.';
+    case 'auth/popup-closed-by-user':
+      return 'Google sign-in popup was closed before completing sign-in.';
+    case 'auth/cancelled-popup-request':
+      return 'Google sign-in was interrupted. Please try again.';
+    default:
+      return `Google sign-in failed: ${error.message ?? 'Unknown Firebase error.'}`;
+  }
+};
+
+const LoginForm: React.FC<LoginFormProps> = ({
+  onLoginSuccess,
+  onGoToSignup,
+}) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneCode, setPhoneCode] = useState('');
+  const [verificationId, setVerificationId] = useState('');
+  const [setupStep, setSetupStep] = useState<'none' | 'phone' | 'otp'>('none');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGoogleSignIn = async () => {
     setError('');
-    setIsLoading(true);
 
-    if (!formData.email || !formData.password) {
-      setError('Please fill in all fields');
-      setIsLoading(false);
+    const savedUser = localStorage.getItem('aiLearningUser');
+
+    if (!savedUser) {
+      setError('No account found yet. Please create an account first.');
       return;
     }
 
-    const success = onLogin(formData.email, formData.password);
-    
-    if (!success) {
-      setError('Invalid email or password. Please try again.');
+    const user = JSON.parse(savedUser) as User;
+
+    if (user.email !== email || user.password !== password) {
+      setError('Incorrect email or password. Please try again.');
+      return;
     }
-    
-    setIsLoading(false);
+
+    onLoginSuccess(user);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header Section */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200 mb-8">
           <div className="text-center">
             <div className="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center rounded-full bg-[#E6F2E9]">
@@ -50,71 +98,88 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
               />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h1>
-            <p className="text-gray-600">Sign in to continue your AI learning journey</p>
+            <p className="text-gray-600">Log in with your MiniAI account to continue.</p>
+            <p className="text-xs text-gray-500 mt-2">Google/Firebase sign-in has been removed from this build.</p>
           </div>
         </div>
 
-        {/* Login Form */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center space-x-3">
-                <AlertCircle className="w-5 h-5 text-red-500" />
-                <p className="text-red-700">{error}</p>
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block text-lg font-semibold text-gray-700 mb-2">
-                Email Address 📧
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-4 py-3 border-3 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none text-lg transition-all duration-200"
-                placeholder="your.email@example.com"
-                required
-              />
+          {error && (
+            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center space-x-3 mb-6">
+              <AlertCircle className="w-5 h-5 text-red-500" />
+              <p className="text-red-700">{error}</p>
             </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none"
+                placeholder="your.email@example.com"
+              />
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 rounded-xl font-semibold"
+              >
+                Send Verification Code
+              </button>
+            </form>
+          )}
 
             <div>
-              <label htmlFor="password" className="block text-lg font-semibold text-gray-700 mb-2">
-                Password 🔒
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-4 py-3 pr-12 border-3 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none text-lg transition-all duration-200"
-                  placeholder="Enter your password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-emerald-600 transition-colors duration-200"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none"
+                placeholder="Enter your password"
+              />
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 hover:scale-105 shadow-lg"
             >
-              {isLoading ? 'Signing In...' : 'Sign In 🚀'}
+              Log In
             </button>
           </form>
+          {setupStep === 'otp' && (
+            <form onSubmit={handleVerifyCode} className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-800">
+                Enter verification code
+              </h2>
+              <input
+                type="text"
+                required
+                value={phoneCode}
+                onChange={(e) => setPhoneCode(e.target.value)}
+                placeholder="123456"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 rounded-xl font-semibold"
+              >
+                Verify & Continue
+              </button>
+            </form>
+          )}
+
+          <div id="recaptcha-container" />
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600 mb-4">Don't have an account yet?</p>
+            <p className="text-gray-600 mb-4">
+              Don't have an account yet?
+            </p>
             <button
               onClick={onGoToSignup}
               className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors duration-200"
