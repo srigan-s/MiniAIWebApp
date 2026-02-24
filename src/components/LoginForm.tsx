@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Sparkles } from 'lucide-react';
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => boolean;
@@ -27,45 +27,51 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
     }
 
     const success = onLogin(formData.email, formData.password);
-    
+
     if (!success) {
       setError('Invalid email or password. Please try again.');
     }
-    
+
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header Section */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200 mb-8">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden z-10">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-[-15%] top-[-10%] h-80 w-80 rounded-full bg-cyan-400/25 blur-3xl animate-float-slow"></div>
+        <div className="absolute right-[-10%] bottom-[-20%] h-96 w-96 rounded-full bg-violet-500/25 blur-3xl animate-float-delay"></div>
+        <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-emerald-400/20 blur-3xl animate-pulse-glow"></div>
+      </div>
+
+      <div className="relative w-full max-w-md z-10">
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_0_45px_rgba(16,185,129,0.16)] p-8 border border-emerald-200/70 mb-6 animate-rise-in">
           <div className="text-center">
-            <div className="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center rounded-full bg-[#E6F2E9]">
-              <div className="absolute inset-0 rounded-full border-4 border-[#A3D9A5] animate-spin-fast"></div>
+            <div className="relative w-36 h-36 mx-auto mb-4 flex items-center justify-center rounded-full bg-white/80 border border-emerald-300/60 shadow-[0_0_30px_rgba(52,211,153,0.35)]">
+              <div className="absolute inset-0 rounded-full border-2 border-emerald-300/45 animate-spin-slow"></div>
+              <div className="absolute inset-2 rounded-full border border-fuchsia-300/40 animate-spin-reverse"></div>
               <img
                 src="/images/miniAiElement.png"
                 alt="MiniAI Logo"
-                className="relative w-20 h-20 object-contain"
+                className="relative w-28 h-28 object-contain drop-shadow-[0_0_12px_rgba(74,222,128,0.6)]"
               />
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back!</h1>
-            <p className="text-gray-600">Sign in to continue your AI learning journey</p>
+            <h1 className="text-3xl font-bold text-emerald-900 mb-2 tracking-wide">Welcome Back!</h1>
+            <p className="text-emerald-800/90">Sign in to continue your AI learning journey</p>
           </div>
         </div>
 
-        {/* Login Form */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="relative bg-white/72 backdrop-blur-xl rounded-3xl shadow-[0_0_45px_rgba(16,185,129,0.14)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in-delay">
+          <div className="absolute inset-0 opacity-35 bg-[linear-gradient(120deg,transparent_0%,#6ee7b7_50%,transparent_100%)] animate-scan"></div>
+          <form onSubmit={handleSubmit} className="relative space-y-6">
             {error && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center space-x-3">
-                <AlertCircle className="w-5 h-5 text-red-500" />
-                <p className="text-red-700">{error}</p>
+              <div className="bg-rose-50/90 border border-rose-200 rounded-xl p-4 flex items-center space-x-3 text-rose-700">
+                <AlertCircle className="w-5 h-5 text-rose-300" />
+                <p>{error}</p>
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-lg font-semibold text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-lg font-semibold text-emerald-900 mb-2">
                 Email Address 📧
               </label>
               <input
@@ -73,14 +79,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
                 id="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-4 py-3 border-3 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none text-lg transition-all duration-200"
+                className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
                 placeholder="your.email@example.com"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-lg font-semibold text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-lg font-semibold text-emerald-900 mb-2">
                 Password 🔒
               </label>
               <div className="relative">
@@ -89,7 +95,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
                   id="password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-4 py-3 pr-12 border-3 border-gray-200 rounded-xl focus:border-emerald-400 focus:outline-none text-lg transition-all duration-200"
+                  className="w-full px-4 py-3 pr-12 border border-emerald-200 bg-white/90 text-emerald-900 rounded-xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
                   placeholder="Enter your password"
                   required
                 />
@@ -97,7 +103,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-emerald-600 transition-colors duration-200"
+                  className="absolute inset-y-0 right-0 flex items-center px-4 text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -107,14 +113,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-[0_10px_24px_rgba(16,185,129,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Signing In...' : 'Sign In 🚀'}
+              <span className="relative z-10 inline-flex items-center gap-2">
+                {isLoading ? 'Signing In...' : 'Sign In'}
+                <Sparkles className="w-5 h-5" />
+              </span>
+              <span className="absolute inset-0 bg-[linear-gradient(120deg,transparent_20%,rgba(255,255,255,0.35)_50%,transparent_80%)] animate-button-shimmer"></span>
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 mb-4">Don't have an account yet?</p>
+          <div className="relative mt-6 text-center">
+            <p className="text-emerald-700 mb-4">Don't have an account yet?</p>
             <button
               onClick={onGoToSignup}
               className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors duration-200"
@@ -126,13 +136,47 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
       </div>
 
       <style>{`
-        @keyframes spin-fast {
+        @keyframes spin-slow {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-        .animate-spin-fast {
-          animation: spin-fast 3s linear infinite;
+        @keyframes spin-reverse {
+          0% { transform: rotate(360deg); }
+          100% { transform: rotate(0deg); }
         }
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-24px); }
+        }
+        @keyframes float-delay {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(20px); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.4; transform: scale(0.9); }
+          50% { opacity: 0.9; transform: scale(1.08); }
+        }
+        @keyframes rise-in {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scan {
+          0% { transform: translateX(-120%); }
+          100% { transform: translateX(120%); }
+        }
+        @keyframes button-shimmer {
+          0% { transform: translateX(-130%); }
+          100% { transform: translateX(130%); }
+        }
+        .animate-spin-slow { animation: spin-slow 10s linear infinite; }
+        .animate-spin-reverse { animation: spin-reverse 7s linear infinite; }
+        .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+        .animate-float-delay { animation: float-delay 10s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 9s ease-in-out infinite; }
+        .animate-rise-in { animation: rise-in 0.65s ease-out forwards; }
+        .animate-rise-in-delay { animation: rise-in 0.8s ease-out forwards; }
+        .animate-scan { animation: scan 6s linear infinite; }
+        .animate-button-shimmer { animation: button-shimmer 2.8s linear infinite; }
       `}</style>
     </div>
   );
