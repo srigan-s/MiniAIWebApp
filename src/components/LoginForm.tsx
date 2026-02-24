@@ -127,9 +127,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
             <p className="text-emerald-700 mb-4">Don't have an account yet?</p>
             <button
               onClick={onGoToSignup}
-              className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors duration-200"
+              className="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-[0_10px_24px_rgba(16,185,129,0.3)]"
             >
-              Create a new account →
+              <span className="relative z-10 inline-flex items-center gap-2">
+                Create New Account
+                <Sparkles className="w-5 h-5" />
+              </span>
+              <span className="absolute inset-0 bg-[linear-gradient(120deg,transparent_20%,rgba(255,255,255,0.35)_50%,transparent_80%)] animate-button-shimmer"></span>
             </button>
           </div>
         </div>

@@ -7,9 +7,10 @@ import Welcome from './onboarding/Welcome';
 
 interface OnboardingFlowProps {
   onComplete: (user: User) => void;
+  onBackToLogin: () => void;
 }
 
-const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
+const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, onBackToLogin }) => {
   const [step, setStep] = useState(1);
   const [userData, setUserData] = useState<Partial<User>>({});
 
@@ -53,6 +54,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           <UserForm 
             onNext={handleStepComplete}
             initialData={userData}
+            onBackToLogin={onBackToLogin}
           />
         )}
         
