@@ -46,13 +46,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
       <div className="relative w-full max-w-md z-10">
         <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_0_45px_rgba(16,185,129,0.16)] p-8 border border-emerald-200/70 mb-6 animate-rise-in">
           <div className="text-center">
-            <div className="relative w-28 h-28 mx-auto mb-4 flex items-center justify-center rounded-full bg-white/80 border border-emerald-300/60 shadow-[0_0_30px_rgba(52,211,153,0.35)]">
+            <div className="relative w-36 h-36 mx-auto mb-4 flex items-center justify-center rounded-full bg-white/80 border border-emerald-300/60 shadow-[0_0_30px_rgba(52,211,153,0.35)]">
               <div className="absolute inset-0 rounded-full border-2 border-emerald-300/45 animate-spin-slow"></div>
               <div className="absolute inset-2 rounded-full border border-fuchsia-300/40 animate-spin-reverse"></div>
               <img
                 src="/images/miniAiElement.png"
                 alt="MiniAI Logo"
-                className="relative w-20 h-20 object-contain drop-shadow-[0_0_12px_rgba(74,222,128,0.6)]"
+                className="relative w-28 h-28 object-contain drop-shadow-[0_0_12px_rgba(74,222,128,0.6)]"
               />
             </div>
             <h1 className="text-3xl font-bold text-emerald-900 mb-2 tracking-wide">Welcome Back!</h1>
