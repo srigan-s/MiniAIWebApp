@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Sparkles } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { User } from '../../types';
 
 interface UserFormProps {
   onNext: (data: Partial<User>) => void;
+  onBackToLogin: () => void;
   initialData: Partial<User>;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
+const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData }) => {
   const [formData, setFormData] = useState({
     name: initialData.name || '',
     age: initialData.age || '',
@@ -62,8 +63,18 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
       </div>
 
       <div className="relative w-full max-w-md z-10">
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_0_45px_rgba(16,185,129,0.16)] p-8 border border-emerald-200/70 mb-6 animate-rise-in">
-          <div className="text-center">
+        <div className="relative bg-white/75 backdrop-blur-xl rounded-[2rem] shadow-[0_0_45px_rgba(16,185,129,0.16)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in">
+          <div className="absolute inset-0 opacity-35 bg-[linear-gradient(120deg,transparent_0%,#6ee7b7_50%,transparent_100%)] animate-scan"></div>
+
+          <button
+            type="button"
+            onClick={onBackToLogin}
+            className="relative z-10 inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-900 font-semibold transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Sign In
+          </button>
+
+          <div className="relative z-10 text-center mt-4 mb-6">
             <div className="relative w-36 h-36 mx-auto mb-4 flex items-center justify-center rounded-full bg-white/80 border border-emerald-300/60 shadow-[0_0_30px_rgba(52,211,153,0.35)]">
               <div className="absolute inset-0 rounded-full border-2 border-emerald-300/45 animate-spin-slow"></div>
               <div className="absolute inset-2 rounded-full border border-fuchsia-300/40 animate-spin-reverse"></div>
@@ -76,93 +87,49 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
             <h1 className="text-3xl font-bold text-emerald-900 mb-2 tracking-wide">Create Your Account</h1>
             <p className="text-emerald-800/90">Let's get to know you better</p>
           </div>
-        </div>
 
-        <div className="relative bg-white/72 backdrop-blur-xl rounded-3xl shadow-[0_0_45px_rgba(16,185,129,0.14)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in-delay">
-          <div className="absolute inset-0 opacity-35 bg-[linear-gradient(120deg,transparent_0%,#6ee7b7_50%,transparent_100%)] animate-scan"></div>
-
-          <form onSubmit={handleSubmit} className="relative space-y-6">
+          <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
             <div>
-              <label htmlFor="name" className="block text-lg font-semibold text-emerald-900 mb-2">
-                What's your name? 😊
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                placeholder="Enter your first name"
-              />
+              <label htmlFor="name" className="block text-lg font-semibold text-emerald-900 mb-2">What's your name? 😊</label>
+              <input type="text" id="name" value={formData.name} onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
+                placeholder="Enter your first name" />
               {errors.name && <p className="text-rose-600 text-sm mt-1">{errors.name}</p>}
             </div>
 
             <div>
-              <label htmlFor="age" className="block text-lg font-semibold text-emerald-900 mb-2">
-                How old are you? 🎂
-              </label>
-              <input
-                type="number"
-                id="age"
-                value={formData.age}
-                onChange={(e) => setFormData((prev) => ({ ...prev, age: e.target.value }))}
-                className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                placeholder="Your age"
-                min={5}
-                max={18}
-              />
+              <label htmlFor="age" className="block text-lg font-semibold text-emerald-900 mb-2">How old are you? 🎂</label>
+              <input type="number" id="age" value={formData.age} onChange={(e) => setFormData((prev) => ({ ...prev, age: e.target.value }))}
+                className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
+                placeholder="Your age" min={5} max={18} />
               {errors.age && <p className="text-rose-600 text-sm mt-1">{errors.age}</p>}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-lg font-semibold text-emerald-900 mb-2">
-                Email address 📧
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                placeholder="your.email@example.com"
-              />
+              <label htmlFor="email" className="block text-lg font-semibold text-emerald-900 mb-2">Email address 📧</label>
+              <input type="email" id="email" value={formData.email} onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
+                placeholder="your.email@example.com" />
               {errors.email && <p className="text-rose-600 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-lg font-semibold text-emerald-900 mb-2">
-                Create a password 🔒
-              </label>
+              <label htmlFor="password" className="block text-lg font-semibold text-emerald-900 mb-2">Create a password 🔒</label>
               <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  value={formData.password}
+                <input type={showPassword ? 'text' : 'password'} id="password" value={formData.password}
                   onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-4 py-3 pr-12 border border-emerald-200 bg-white/90 text-emerald-900 rounded-xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                  placeholder="Enter a password"
-                  minLength={4}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 flex items-center px-4 text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
-                >
+                  className="w-full px-4 py-3 pr-12 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
+                  placeholder="Enter a password" minLength={4} />
+                <button type="button" onClick={() => setShowPassword((prev) => !prev)} aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute inset-y-0 right-0 flex items-center px-4 text-emerald-600 hover:text-emerald-700 transition-colors duration-200">
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && <p className="text-rose-600 text-sm mt-1">{errors.password}</p>}
             </div>
 
-            <button
-              type="submit"
-              className="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-[0_10px_24px_rgba(16,185,129,0.3)]"
-            >
-              <span className="relative z-10 inline-flex items-center gap-2">
-                Continue to Avatar Selection
-                <Sparkles className="w-5 h-5" />
-              </span>
+            <button type="submit" className="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-[0_10px_24px_rgba(16,185,129,0.3)]">
+              <span className="relative z-10 inline-flex items-center gap-2">Continue to Avatar Selection <Sparkles className="w-5 h-5" /></span>
               <span className="absolute inset-0 bg-[linear-gradient(120deg,transparent_20%,rgba(255,255,255,0.35)_50%,transparent_80%)] animate-button-shimmer"></span>
             </button>
           </form>
@@ -170,45 +137,20 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, initialData }) => {
       </div>
 
       <style>{`
-        @keyframes spin-slow {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes spin-reverse {
-          0% { transform: rotate(360deg); }
-          100% { transform: rotate(0deg); }
-        }
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-24px); }
-        }
-        @keyframes float-delay {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(20px); }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { opacity: 0.4; transform: scale(0.9); }
-          50% { opacity: 0.9; transform: scale(1.08); }
-        }
-        @keyframes rise-in {
-          from { opacity: 0; transform: translateY(16px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scan {
-          0% { transform: translateX(-120%); }
-          100% { transform: translateX(120%); }
-        }
-        @keyframes button-shimmer {
-          0% { transform: translateX(-130%); }
-          100% { transform: translateX(130%); }
-        }
+        @keyframes spin-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        @keyframes float-slow { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-24px); } }
+        @keyframes float-delay { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(20px); } }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.4; transform: scale(0.9); } 50% { opacity: 0.9; transform: scale(1.08); } }
+        @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scan { 0% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+        @keyframes button-shimmer { 0% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
         .animate-spin-slow { animation: spin-slow 10s linear infinite; }
         .animate-spin-reverse { animation: spin-reverse 7s linear infinite; }
         .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
         .animate-float-delay { animation: float-delay 10s ease-in-out infinite; }
         .animate-pulse-glow { animation: pulse-glow 9s ease-in-out infinite; }
         .animate-rise-in { animation: rise-in 0.65s ease-out forwards; }
-        .animate-rise-in-delay { animation: rise-in 0.8s ease-out forwards; }
         .animate-scan { animation: scan 6s linear infinite; }
         .animate-button-shimmer { animation: button-shimmer 2.8s linear infinite; }
       `}</style>
