@@ -204,7 +204,10 @@ function App() {
     return (
       <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
         <FloatingBubbles />
+
         <OnboardingFlow onComplete={handleOnboardingComplete} onBackToLogin={handleBackToLoginFromSignup} />
+        <OnboardingFlow onComplete={handleOnboardingComplete} />
+
       </div>
     );
   }
