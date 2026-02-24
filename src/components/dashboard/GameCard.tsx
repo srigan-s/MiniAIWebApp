@@ -38,6 +38,7 @@ const GameCard: React.FC<GameCardProps> = ({ game, isCompleted, onStart }) => {
         </div>
         
         {isCompleted ? (
+          // isUnlocked ?
           <div className="flex items-center space-x-1 text-green-600">
             <CheckCircle className="w-5 h-5" />
             <span className="text-sm font-medium">Completed</span>

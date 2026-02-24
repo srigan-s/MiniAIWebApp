@@ -10,20 +10,30 @@ interface LessonCardProps {
     icon: string;
   };
   isCompleted: boolean;
+  isLocked: boolean;
   onStart: () => void;
 }
 
-const LessonCard: React.FC<LessonCardProps> = ({ lesson, isCompleted, onStart }) => {
+const LessonCard: React.FC<LessonCardProps> = ({ lesson, isCompleted, isLocked, onStart }) => {
+  const cardStyle = isLocked
+    ? 'bg-gray-100 border-gray-300 shadow-sm cursor-not-allowed opacity-80'
+    : isCompleted
+      ? 'bg-green-50 border-green-200 shadow-lg cursor-pointer'
+      : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200 shadow-md hover:shadow-xl cursor-pointer';
+
+  const iconStyle = isLocked ? 'bg-gray-200' : isCompleted ? 'bg-green-200' : 'bg-cyan-200';
+
   return (
-    <div className={`rounded-2xl p-6 border-3 transition-all duration-200 hover:scale-105 cursor-pointer ${
-      isCompleted 
-        ? 'bg-green-50 border-green-200 shadow-lg' 
-        : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200 shadow-md hover:shadow-xl'
-    }`} onClick={onStart}>
+    <div
+      className={`rounded-2xl p-6 border-3 transition-all duration-200 ${isLocked ? '' : 'hover:scale-105'} ${cardStyle}`}
+      onClick={() => {
+        if (!isLocked) {
+          onStart();
+        }
+      }}
+    >
       <div className="text-center mb-4">
-        <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl ${
-          isCompleted ? 'bg-green-200' : 'bg-cyan-200'
-        }`}>
+        <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl ${iconStyle}`}>
           {lesson.icon}
         </div>
       </div>
@@ -41,6 +51,11 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson, isCompleted, onStart })
           <div className="flex items-center space-x-1 text-green-600">
             <CheckCircle className="w-5 h-5" />
             <span className="text-sm font-medium">Completed</span>
+          </div>
+        ) : isLocked ? (
+          <div className="flex items-center space-x-1 text-gray-600 bg-gray-200 px-3 py-2 rounded-lg">
+            <Lock className="w-4 h-4" />
+            <span className="text-sm font-medium">Locked</span>
           </div>
         ) : (
           <button className="bg-cyan-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-cyan-600 transition-colors duration-200">
