@@ -65,7 +65,7 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
       <div className="relative w-full max-w-md z-10">
         <div className="relative bg-emerald-50/80 backdrop-blur-xl rounded-[2rem] shadow-[0_0_45px_rgba(16,185,129,0.16)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in">
           <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(16,185,129,0.2)_0%,rgba(34,211,238,0.2)_35%,rgba(99,102,241,0.2)_65%,rgba(16,185,129,0.2)_100%)]"></div>
-          <div className="absolute inset-y-0 -left-[60%] w-[85%] opacity-80 bg-[linear-gradient(110deg,rgba(16,185,129,0.92)_0%,rgba(34,211,238,0.9)_34%,rgba(99,102,241,0.9)_70%,rgba(168,85,247,0.88)_100%)] blur-[1px] animate-scan-color"></div>
+          <div className="absolute inset-y-0 -left-[60%] w-[85%] opacity-70 bg-[linear-gradient(110deg,rgba(134,239,172,0.85)_0%,rgba(187,247,208,0.85)_40%,rgba(221,214,254,0.9)_75%,rgba(196,181,253,0.9)_100%)] blur-[1px] animate-scan-color"></div>
 
           <button
             type="button"
