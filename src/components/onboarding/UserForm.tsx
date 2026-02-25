@@ -64,7 +64,7 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
 
       <div className="relative w-full max-w-md z-10">
         <div className="relative bg-white/75 backdrop-blur-xl rounded-[2rem] shadow-[0_0_45px_rgba(16,185,129,0.16)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in">
-          <div className="absolute inset-0 opacity-55 bg-[linear-gradient(110deg,rgba(16,185,129,0.05)_0%,rgba(34,211,238,0.35)_20%,rgba(99,102,241,0.32)_45%,rgba(168,85,247,0.3)_65%,rgba(251,191,36,0.26)_82%,rgba(16,185,129,0.08)_100%)] animate-scan-color"></div>
+          <div className="absolute inset-0 opacity-60 bg-[linear-gradient(110deg,rgba(16,185,129,0.14)_0%,rgba(34,211,238,0.28)_24%,rgba(99,102,241,0.3)_50%,rgba(168,85,247,0.27)_74%,rgba(16,185,129,0.16)_100%)] animate-scan-color"></div>
 
           <button
             type="button"
@@ -144,9 +144,9 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
         @keyframes pulse-glow { 0%, 100% { opacity: 0.4; transform: scale(0.9); } 50% { opacity: 0.9; transform: scale(1.08); } }
         @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes scan-color {
-          0% { transform: translateX(-30%) scaleX(1); filter: hue-rotate(0deg) saturate(1); }
-          50% { transform: translateX(0%) scaleX(1.08); filter: hue-rotate(22deg) saturate(1.2); }
-          100% { transform: translateX(30%) scaleX(1); filter: hue-rotate(0deg) saturate(1); }
+          0% { transform: translate3d(-32%, 0, 0) scaleX(1.02); filter: hue-rotate(0deg) saturate(1); }
+          50% { transform: translate3d(0%, 0, 0) scaleX(1.06); filter: hue-rotate(16deg) saturate(1.15); }
+          100% { transform: translate3d(32%, 0, 0) scaleX(1.02); filter: hue-rotate(0deg) saturate(1); }
         }
         @keyframes button-shimmer { 0% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
         .animate-spin-slow { animation: spin-slow 10s linear infinite; }
@@ -155,7 +155,7 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
         .animate-float-delay { animation: float-delay 10s ease-in-out infinite; }
         .animate-pulse-glow { animation: pulse-glow 9s ease-in-out infinite; }
         .animate-rise-in { animation: rise-in 0.65s ease-out forwards; }
-        .animate-scan-color { animation: scan-color 3.6s linear infinite; }
+        .animate-scan-color { animation: scan-color 4.8s ease-in-out infinite; }
         .animate-button-shimmer { animation: button-shimmer 2.8s linear infinite; }
       `}</style>
     </div>

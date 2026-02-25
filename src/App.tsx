@@ -206,8 +206,6 @@ function App() {
         <FloatingBubbles />
 
         <OnboardingFlow onComplete={handleOnboardingComplete} onBackToLogin={handleBackToLoginFromSignup} />
-        <OnboardingFlow onComplete={handleOnboardingComplete} />
-
       </div>
     );
   }
