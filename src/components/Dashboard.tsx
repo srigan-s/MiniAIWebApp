@@ -64,6 +64,14 @@ const lessons = [
 ];
 
 const lessonSequence = [1, 4, 5, 2, 3, 6];
+const gameSequence = [
+  'robot-training',
+  'data-sorting',
+  'quiz-battle',
+  'neural-network-builder',
+  'image-classifier',
+  'bias-detector'
+];
 
 const games = [
   {
@@ -125,6 +133,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
   const orderedLessons = lessonSequence
     .map((lessonId) => lessonsById.get(lessonId))
     .filter((lesson): lesson is (typeof lessons)[number] => Boolean(lesson));
+  const gamesById = new Map(games.map((game) => [game.id, game]));
+  const orderedGames = gameSequence
+    .map((gameId) => gamesById.get(gameId))
+    .filter((game): game is (typeof games)[number] => Boolean(game));
 
   const isLessonLocked = (lessonId: number) => {
     const lessonIndex = lessonSequence.indexOf(lessonId);
@@ -132,6 +144,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
 
     const previousLessonId = lessonSequence[lessonIndex - 1];
     return !user.completedLessons.includes(previousLessonId);
+  };
+
+  const isGameLocked = (gameId: string) => {
+    const gameIndex = gameSequence.indexOf(gameId);
+    if (gameIndex <= 0) return false;
+
+    const previousGameId = gameSequence[gameIndex - 1];
+    return !user.completedGames.includes(previousGameId);
   };
 
   // Calculate progress based on completed activities
@@ -211,14 +231,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.map((game) => (
-            <GameCard
-              key={game.id}
-              game={game}
-              isCompleted={user.completedGames.includes(game.id)}
-              onStart={() => onStartGame(game.id)}
-            />
-          ))}
+          {orderedGames.map((game) => {
+            const isCompleted = user.completedGames.includes(game.id);
+            const isLocked = isGameLocked(game.id);
+
+            return (
+              <GameCard
+                key={game.id}
+                game={game}
+                isCompleted={isCompleted}
+                isLocked={isLocked}
+                onStart={() => onStartGame(game.id)}
+              />
+            );
+          })}
         </div>
       </div>
 
