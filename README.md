@@ -24,10 +24,41 @@ MiniAI‑Learn helps young learners explore artificial intelligence in an enjoya
 
 1. Create a `.env` file in the project root.
 2. Copy the values from `.env.example`.
-3. Set `VITE_GEMINI_API_KEY` to your Gemini API key.
-4. Start the app with `npm run dev`.
+3. Set `GEMINI_API_KEY` to your Gemini API key.
+4. Leave `DATABASE_URL` empty for local SQLite, or set it to a Postgres connection string if you want local Postgres.
+5. Start the backend with `npm run server`.
+6. Start the frontend with `npm run dev`.
 
-This implementation calls Gemini directly from the browser for quick setup. For production, move the API call to a backend so the key is not exposed to clients.
+Gemini requests now go through the backend so the API key stays off the client.
+
+## 🌐 Deployment
+
+Recommended setup:
+
+- Frontend: Netlify
+- Backend API: Render
+
+### Netlify
+
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Environment variable: `VITE_API_BASE_URL=https://your-render-service.onrender.com/api`
+
+### Render
+
+- Service type: Web Service
+- Build command: `npm install`
+- Start command: `npm run server`
+- Environment variables:
+  - `DATABASE_URL`
+  - `GEMINI_API_KEY`
+  - `GEMINI_MODEL=gemini-2.5-flash`
+
+The repo includes [netlify.toml](/Users/vedantkansara/FinalMiniAI/MiniAIWebApp/MiniAIWebApp/netlify.toml) and [render.yaml](/Users/vedantkansara/FinalMiniAI/MiniAIWebApp/MiniAIWebApp/render.yaml) to help bootstrap deployment.
+
+## 🗄️ Database Note
+
+This project now prefers Postgres when `DATABASE_URL` is set and falls back to SQLite at `server/data/miniai.db` for local development. On Render, use the managed Postgres database from `render.yaml` so user progress and auth data persist safely across deploys.
 
 ---
 

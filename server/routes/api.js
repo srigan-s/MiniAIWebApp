@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRouter from './auth.js';
 import { findUserById, updateUserProgress } from '../models/users.js';
+import { hasGeminiConfig, requestGeminiChatReply } from '../services/gemini.js';
 
 const apiRouter = Router();
 
@@ -13,6 +14,27 @@ apiRouter.get('/health', (_req, res) => {
 });
 
 apiRouter.use('/auth', authRouter);
+
+apiRouter.get('/chat/status', (_req, res) => {
+  res.json({
+    configured: hasGeminiConfig(),
+  });
+});
+
+apiRouter.post('/chat/gemini', async (req, res) => {
+  const { messages, systemPrompt } = req.body ?? {};
+
+  if (!Array.isArray(messages) || typeof systemPrompt !== 'string' || !systemPrompt.trim()) {
+    return res.status(400).json({ error: 'Chat payload is invalid.' });
+  }
+
+  if (!hasGeminiConfig()) {
+    return res.status(503).json({ error: 'Gemini is not configured on the server.' });
+  }
+
+  const reply = await requestGeminiChatReply(messages, systemPrompt);
+  return res.json({ reply });
+});
 
 apiRouter.patch('/users/:id/progress', async (req, res) => {
   const { id } = req.params;

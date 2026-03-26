@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Brain, Loader2, MessageCircle, Send, Sparkles, X } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import {
@@ -45,13 +45,12 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeminiReady, setIsGeminiReady] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
       role: 'bot',
-      text: hasGeminiConfig()
-        ? "Hi! I'm the MiniAI Helper. Ask me anything about AI, your progress, or what to do next."
-        : "Hi! I'm the MiniAI Helper. Add your Gemini API key to unlock live answers, or ask me about AI topics, your progress, or what to do next.",
+      text: "Hi! I'm the MiniAI Helper. Ask me anything about AI, your progress, or what to do next.",
     },
   ]);
 
@@ -89,6 +88,24 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
 
     return 'You are on the dashboard, so this is a good time to pick your next lesson or game.';
   }, [currentGame, currentLesson, currentView]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadStatus = async () => {
+      const configured = await hasGeminiConfig();
+
+      if (isMounted) {
+        setIsGeminiReady(configured);
+      }
+    };
+
+    void loadStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   if (!user) return null;
 
@@ -211,7 +228,7 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
     setIsLoading(true);
 
     try {
-      if (hasGeminiConfig()) {
+      if (isGeminiReady) {
         const reply = await requestGeminiChatReply(
           nextMessages
             .filter((entry) => entry.role === 'user' || entry.role === 'bot')
@@ -310,9 +327,9 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
               <p className="mb-3 text-sm text-slate-600">{currentActivitySummary}</p>
-              {!hasGeminiConfig() && (
+              {!isGeminiReady && (
                 <p className="mb-3 text-xs font-medium text-amber-700">
-                  Live Gemini replies are off until `VITE_GEMINI_API_KEY` is set.
+                  Live Gemini replies are off until `GEMINI_API_KEY` is set on the backend.
                 </p>
               )}
               <button
