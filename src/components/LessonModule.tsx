@@ -6,6 +6,7 @@ import AIInRealLife from './lessons/AIInRealLife';
 import NeuralNetworks from './lessons/NeuralNetworks';
 import ComputerVision from './lessons/ComputerVision';
 import AIBias from './lessons/AIBias';
+import MultimodalAI from './lessons/MultimodalAI';
 
 interface LessonModuleProps {
   lessonId: number;
@@ -43,6 +44,8 @@ const LessonModule: React.FC<LessonModuleProps> = ({ lessonId, onComplete }) => 
         return <ComputerVision onComplete={() => handleLessonComplete(50)} />;
       case 6:
         return <AIBias onComplete={() => handleLessonComplete(55)} />;
+      case 7:
+        return <MultimodalAI onComplete={() => handleLessonComplete(60)} />;
       default:
         return <div>Lesson not found</div>;
     }

@@ -10,7 +10,6 @@ import MiniGame from './components/MiniGame';
 import Header from './components/Header';
 import ChatbotHelper from './components/ChatbotHelper';
 import { loginUser } from './lib/authApi';
-
 const USER_STORAGE_KEY = 'aiLearningUserSession';
 
 const FloatingBubbles = () => (

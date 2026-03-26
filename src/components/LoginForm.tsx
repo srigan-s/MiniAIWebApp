@@ -59,7 +59,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
             <p className="text-emerald-800/90">Sign in to continue your AI learning journey</p>
           </div>
         </div>
-
         <div className="relative bg-white/72 backdrop-blur-xl rounded-3xl shadow-[0_0_45px_rgba(16,185,129,0.14)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in-delay">
           <div className="absolute inset-0 opacity-35 bg-[linear-gradient(120deg,transparent_0%,#6ee7b7_50%,transparent_100%)] animate-scan"></div>
           <form onSubmit={handleSubmit} className="relative space-y-6">

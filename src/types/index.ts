@@ -53,6 +53,6 @@ export interface MiniGameConfig {
   id: string;
   title: string;
   description: string;
-  type: 'robot-training' | 'data-sorting' | 'quiz-battle' | 'neural-network-builder' | 'image-classifier' | 'bias-detector';
+  type: 'robot-training' | 'data-sorting' | 'quiz-battle' | 'neural-network-builder' | 'image-classifier' | 'bias-detector' | 'language-lab';
   xpReward: number;
 }

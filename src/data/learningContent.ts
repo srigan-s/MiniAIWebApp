@@ -65,9 +65,20 @@ export const lessons = [
     helperSummary:
       'AI bias happens when training data or rules lead to unfair results. Fair AI checks for missing voices and uneven outcomes.',
   },
+  {
+    id: 7,
+    title: 'Multimodal AI Adventure',
+    description: 'Explore the many kinds of input AI can understand, like text, images, sound, and more!',
+    type: 'animation-quiz' as const,
+    xpReward: 60,
+    icon: '🎒',
+    keywords: ['multimodal', 'inputs', 'text image sound', 'different types of input'],
+    helperSummary:
+      'Multimodal AI can work with more than one kind of input, such as words, pictures, audio, video, or sensor signals, to better understand a task.',
+  },
 ];
 
-export const lessonSequence = [1, 4, 5, 2, 3, 6];
+export const lessonSequence = [1, 4, 5, 2, 3, 6, 7];
 
 export const games = [
   {
@@ -136,6 +147,17 @@ export const games = [
     helperSummary:
       'This game teaches you to notice when an AI system may be unfair and why balanced data matters.',
   },
+  {
+    id: 'language-lab',
+    title: 'Language Lab',
+    description: 'Help an AI sort words, spot sentence patterns, and understand simple syntax clues!',
+    type: 'language-lab' as const,
+    xpReward: 70,
+    icon: '💬',
+    keywords: ['language', 'nlp', 'words', 'syntax', 'sentence'],
+    helperSummary:
+      'This game introduces natural language processing by showing how AI looks at words, order, and sentence clues to understand language.',
+  },
 ];
 
 export const gameSequence = [
@@ -145,6 +167,7 @@ export const gameSequence = [
   'neural-network-builder',
   'image-classifier',
   'bias-detector',
+  'language-lab',
 ];
 
 export const lessonMap = new Map(lessons.map((lesson) => [lesson.id, lesson]));

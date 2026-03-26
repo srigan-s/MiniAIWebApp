@@ -6,6 +6,7 @@ import QuizBattle from './games/QuizBattle';
 import NeuralNetworkBuilder from './games/NeuralNetworkBuilder';
 import ImageClassifier from './games/ImageClassifier';
 import BiasDetector from './games/BiasDetector';
+import LanguageLab from './games/LanguageLab';
 
 interface MiniGameProps {
   gameId: string;
@@ -38,6 +39,8 @@ const MiniGame: React.FC<MiniGameProps> = ({ gameId, onComplete }) => {
         return <ImageClassifier onComplete={() => handleGameComplete(55)} />;
       case 'bias-detector':
         return <BiasDetector onComplete={() => handleGameComplete(65)} />;
+      case 'language-lab':
+        return <LanguageLab onComplete={() => handleGameComplete(70)} />;
       default:
         return <div>Game not found</div>;
     }
