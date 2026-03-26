@@ -5,6 +5,7 @@ import { GameProvider } from './contexts/GameContext';
 import OnboardingFlow from './components/OnboardingFlow';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
+import ProfilePage from './components/ProfilePage';
 import LessonModule from './components/LessonModule';
 import MiniGame from './components/MiniGame';
 import Header from './components/Header';
@@ -128,7 +129,7 @@ const FloatingBubbles = () => (
 );
 
 function App() {
-  const [currentView, setCurrentView] = useState<'login' | 'onboarding' | 'dashboard' | 'lesson' | 'game'>('login');
+  const [currentView, setCurrentView] = useState<'login' | 'onboarding' | 'dashboard' | 'profile' | 'lesson' | 'game'>('login');
   const [currentLesson, setCurrentLesson] = useState<number | null>(null);
   const [currentGame, setCurrentGame] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -186,6 +187,12 @@ function App() {
     setCurrentGame(null);
   };
 
+  const handleOpenProfile = () => {
+    setCurrentView('profile');
+    setCurrentLesson(null);
+    setCurrentGame(null);
+  };
+
   if (currentView === 'login') {
     return (
       <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
@@ -216,7 +223,13 @@ function App() {
       <GameProvider>
         <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
           <FloatingBubbles />
-          <Header onBackToDashboard={handleBackToDashboard} showBackButton={currentView !== 'dashboard'} onLogout={handleLogout} />
+          <Header
+            onBackToDashboard={handleBackToDashboard}
+            showBackButton={currentView !== 'dashboard'}
+            onLogout={handleLogout}
+            onOpenProfile={handleOpenProfile}
+            isProfileView={currentView === 'profile'}
+          />
           
           <main className="container mx-auto px-4 py-8 relative z-10">
             {currentView === 'dashboard' && (
@@ -225,6 +238,8 @@ function App() {
                 onStartGame={handleStartGame}
               />
             )}
+
+            {currentView === 'profile' && <ProfilePage />}
             
             {currentView === 'lesson' && currentLesson !== null && (
               <LessonModule 
