@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AlertCircle, Eye, EyeOff, Sparkles } from 'lucide-react';
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => boolean;
+  onLogin: (email: string, password: string) => Promise<void>;
   onGoToSignup: () => void;
 }
 
@@ -26,10 +26,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onGoToSignup }) => {
       return;
     }
 
-    const success = onLogin(formData.email, formData.password);
-
-    if (!success) {
-      setError('Invalid email or password. Please try again.');
+    try {
+      await onLogin(formData.email, formData.password);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Invalid email or password. Please try again.');
     }
 
     setIsLoading(false);

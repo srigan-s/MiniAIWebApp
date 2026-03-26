@@ -1,5 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useRef, useState } from 'react';
 import { User, Badge } from '../types';
+import { syncUserProgress } from '../lib/authApi';
+
+const USER_STORAGE_KEY = 'aiLearningUserSession';
 
 interface UserContextType {
   user: User | null;
@@ -25,71 +28,141 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
   initialUser 
 }) => {
   const [user, setUser] = useState<User | null>(initialUser);
+  const syncQueueRef = useRef(Promise.resolve());
 
-  const updateUser = (updates: Partial<User>) => {
-    if (!user) return;
-    
-    const updatedUser = { ...user, ...updates };
-    setUser(updatedUser);
-    localStorage.setItem('aiLearningUser', JSON.stringify(updatedUser));
+  const persistUserSession = (nextUser: User) => {
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
   };
 
-  const addXP = (amount: number) => {
-    if (!user) return;
-    
-    const newXP = user.xp + amount;
-    const newLevel = Math.floor(newXP / 100) + 1;
-    
-    updateUser({ xp: newXP, level: newLevel });
-    
-    // Check for milestone badges
-    if (newXP >= 100 && !user.badges.find(b => b.id === 'xp-milestone-100')) {
-      const badge: Badge = {
-        id: 'xp-milestone-100',
-        name: 'XP Master',
-        description: 'Earned 100 XP!',
-        icon: '🏆',
-        unlockedAt: new Date()
-      };
-      addBadge(badge);
-    }
+  const enqueueProgressSync = (nextUser: User) => {
+    syncQueueRef.current = syncQueueRef.current
+      .catch(() => undefined)
+      .then(async () => {
+        try {
+          const syncedUser = await syncUserProgress(nextUser.id, {
+            xp: nextUser.xp,
+            level: nextUser.level,
+            badges: nextUser.badges,
+            completedLessons: nextUser.completedLessons,
+            completedGames: nextUser.completedGames,
+          });
+
+          setUser((currentUser) => {
+            if (!currentUser || currentUser.id !== syncedUser.id) {
+              return currentUser;
+            }
+
+            const mergedUser = {
+              ...currentUser,
+              ...syncedUser,
+            };
+            persistUserSession(mergedUser);
+            return mergedUser;
+          });
+        } catch (error) {
+          console.error('Failed to sync user progress:', error);
+        }
+      });
+  };
+
+  const applyUserUpdate = (updater: (currentUser: User) => User) => {
+    setUser((currentUser) => {
+      if (!currentUser) {
+        return currentUser;
+      }
+
+      const nextUser = updater(currentUser);
+      persistUserSession(nextUser);
+      enqueueProgressSync(nextUser);
+      return nextUser;
+    });
+  };
+
+  const updateUser = (updates: Partial<User>) => {
+    applyUserUpdate((currentUser) => ({ ...currentUser, ...updates }));
   };
 
   const addBadge = (badge: Badge) => {
-    if (!user) return;
-    
-    const badges = [...user.badges, badge];
-    updateUser({ badges });
+    applyUserUpdate((currentUser) => {
+      if (currentUser.badges.some((existingBadge) => existingBadge.id === badge.id)) {
+        return currentUser;
+      }
+
+      return {
+        ...currentUser,
+        badges: [...currentUser.badges, badge],
+      };
+    });
+  };
+
+  const addXP = (amount: number) => {
+    applyUserUpdate((currentUser) => {
+      const newXP = currentUser.xp + amount;
+      const newLevel = Math.floor(newXP / 100) + 1;
+      const hasMilestoneBadge = currentUser.badges.some((badge) => badge.id === 'xp-milestone-100');
+
+      const badges = hasMilestoneBadge || newXP < 100
+        ? currentUser.badges
+        : [
+            ...currentUser.badges,
+            {
+              id: 'xp-milestone-100',
+              name: 'XP Master',
+              description: 'Earned 100 XP!',
+              icon: '🏆',
+              unlockedAt: new Date(),
+            },
+          ];
+
+      return {
+        ...currentUser,
+        xp: newXP,
+        level: newLevel,
+        badges,
+      };
+    });
   };
 
   const completeLesson = (lessonId: number) => {
-    if (!user) return;
-    
-    if (!user.completedLessons.includes(lessonId)) {
-      const completedLessons = [...user.completedLessons, lessonId];
-      updateUser({ completedLessons });
-      
-      // First lesson badge
-      if (completedLessons.length === 1 && !user.badges.find(b => b.id === 'first-lesson')) {
-        const badge: Badge = {
-          id: 'first-lesson',
-          name: 'First Steps',
-          description: 'Completed your first lesson!',
-          icon: '🌟',
-          unlockedAt: new Date()
-        };
-        addBadge(badge);
+    applyUserUpdate((currentUser) => {
+      if (currentUser.completedLessons.includes(lessonId)) {
+        return currentUser;
       }
-    }
+
+      const completedLessons = [...currentUser.completedLessons, lessonId];
+      const hasFirstLessonBadge = currentUser.badges.some((badge) => badge.id === 'first-lesson');
+      const badges = hasFirstLessonBadge
+        ? currentUser.badges
+        : [
+            ...currentUser.badges,
+            {
+              id: 'first-lesson',
+              name: 'First Steps',
+              description: 'Completed your first lesson!',
+              icon: '🌟',
+              unlockedAt: new Date(),
+            },
+          ];
+
+      return {
+        ...currentUser,
+        completedLessons,
+        badges,
+      };
+    });
   };
 
   const completeGame = (gameId: string) => {
-    if (!user) return;
-    
-    if (!user.completedGames.includes(gameId)) {
-      const completedGames = [...user.completedGames, gameId];
-      updateUser({ completedGames });
-    }
+    applyUserUpdate((currentUser) => {
+      if (currentUser.completedGames.includes(gameId)) {
+        return currentUser;
+      }
+
+      return {
+        ...currentUser,
+        completedGames: [...currentUser.completedGames, gameId],
+      };
+    });
   };
 
   return (

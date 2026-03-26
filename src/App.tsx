@@ -9,6 +9,9 @@ import LessonModule from './components/LessonModule';
 import MiniGame from './components/MiniGame';
 import Header from './components/Header';
 import ChatbotHelper from './components/ChatbotHelper';
+import { loginUser } from './lib/authApi';
+
+const USER_STORAGE_KEY = 'aiLearningUserSession';
 
 const FloatingBubbles = () => (
   <>
@@ -132,28 +135,23 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('aiLearningUser');
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY);
     if (savedUser) {
       setUser(JSON.parse(savedUser));
       setCurrentView('dashboard');
     }
   }, []);
 
-  const handleLogin = (email: string, password: string) => {
-    const savedUser = localStorage.getItem('aiLearningUser');
-    if (savedUser) {
-      const userData = JSON.parse(savedUser);
-      if (userData.email === email && userData.password === password) {
-        setUser(userData);
-        setCurrentView('dashboard');
-        return true;
-      }
-    }
-    return false;
+  const handleLogin = async (email: string, password: string) => {
+    const userData = await loginUser({ email, password });
+    setUser(userData);
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
+    setCurrentView('dashboard');
   };
 
   const handleLogout = () => {
     setUser(null);
+    localStorage.removeItem(USER_STORAGE_KEY);
     setCurrentView('login');
     setCurrentLesson(null);
     setCurrentGame(null);
@@ -169,7 +167,7 @@ function App() {
 
   const handleOnboardingComplete = (userData: User) => {
     setUser(userData);
-    localStorage.setItem('aiLearningUser', JSON.stringify(userData));
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
     setCurrentView('dashboard');
   };
 

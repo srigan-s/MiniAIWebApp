@@ -2,11 +2,12 @@ import React from 'react';
 import { User } from '../../types';
 
 interface WelcomeProps {
-  onComplete: (data: {}) => void;
+  onComplete: (data: Record<string, never>) => void;
   userData: Partial<User>;
+  isSubmitting?: boolean;
 }
 
-const Welcome: React.FC<WelcomeProps> = ({ onComplete, userData }) => {
+const Welcome: React.FC<WelcomeProps> = ({ onComplete, userData, isSubmitting = false }) => {
   const handleStart = () => {
     onComplete({});
   };
@@ -53,9 +54,10 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete, userData }) => {
 
         <button
           onClick={handleStart}
+          disabled={isSubmitting}
           className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-4 rounded-xl font-bold text-xl hover:from-emerald-600 hover:to-cyan-600 transition-all duration-200 hover:scale-105 shadow-lg animate-pulse"
         >
-          Start Your AI Adventure! 🚀
+          {isSubmitting ? 'Creating your account...' : 'Start Your AI Adventure! 🚀'}
         </button>
       </div>
     </div>
