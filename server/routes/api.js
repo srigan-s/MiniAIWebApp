@@ -65,7 +65,6 @@ apiRouter.patch('/users/:id/progress', async (req, res) => {
 
   return res.json({ user });
 });
-
 apiRouter.get('/example', (_req, res) => {
   res.json({
     message: 'Future API endpoints can be added under server/routes/api.js or split into more route files.',
