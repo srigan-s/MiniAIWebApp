@@ -1,3 +1,88 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --app-bg:
+      radial-gradient(circle at top left, rgba(125, 211, 252, 0.34), transparent 24%),
+      radial-gradient(circle at 82% 10%, rgba(251, 191, 36, 0.2), transparent 18%),
+      linear-gradient(180deg, #f7fbff 0%, #eefaf7 52%, #fff8ef 100%);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: var(--app-bg);
+    color: #0f172a;
+    font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @keyframes float-avatar {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes toast-pop {
+    0% {
+      opacity: 0;
+      transform: translateY(-12px) scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes level-pop {
+    0% {
+      opacity: 0;
+      transform: translateY(18px) scale(0.94);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes avatar-bounce {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.04);
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-float-avatar {
+    animation: float-avatar 3.4s ease-in-out infinite;
+  }
+}

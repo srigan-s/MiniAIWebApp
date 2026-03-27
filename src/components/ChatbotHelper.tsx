@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { Brain, Loader2, MessageCircle, Send, Sparkles, X } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Brain, Loader2, Send, Sparkles, X } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import {
   gameMap,
@@ -45,13 +45,13 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeminiReady, setIsGeminiReady] = useState(false);
+  const [companionOffset, setCompanionOffset] = useState({ x: 0, y: 0 });
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
       role: 'bot',
-      text: hasGeminiConfig()
-        ? "Hi! I'm the MiniAI Helper. Ask me anything about AI, your progress, or what to do next."
-        : "Hi! I'm the MiniAI Helper. Add your Gemini API key to unlock live answers, or ask me about AI topics, your progress, or what to do next.",
+      text: "Hi! I'm the MiniAI Helper. Ask me anything about AI, your progress, or what to do next.",
     },
   ]);
 
@@ -89,6 +89,40 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
 
     return 'You are on the dashboard, so this is a good time to pick your next lesson or game.';
   }, [currentGame, currentLesson, currentView]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadStatus = async () => {
+      const configured = await hasGeminiConfig();
+
+      if (isMounted) {
+        setIsGeminiReady(configured);
+      }
+    };
+
+    void loadStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      const screenCenterX = window.innerWidth / 2;
+      const screenCenterY = window.innerHeight / 2;
+      const x = Math.max(-10, Math.min(10, (event.clientX - screenCenterX) / 45));
+      const y = Math.max(-8, Math.min(8, (event.clientY - screenCenterY) / 60));
+      setCompanionOffset({ x, y });
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+    };
+  }, []);
 
   if (!user) return null;
 
@@ -211,7 +245,7 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
     setIsLoading(true);
 
     try {
-      if (hasGeminiConfig()) {
+      if (isGeminiReady) {
         const reply = await requestGeminiChatReply(
           nextMessages
             .filter((entry) => entry.role === 'user' || entry.role === 'bot')
@@ -243,7 +277,7 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
   return (
     <>
       {isOpen && (
-        <div className="fixed bottom-24 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm rounded-[2rem] border-4 border-cyan-200 bg-white/95 shadow-2xl backdrop-blur-sm">
+        <div className="fixed bottom-28 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm rounded-[2rem] border-4 border-cyan-200 bg-white/95 shadow-2xl backdrop-blur-sm">
           <div className="rounded-t-[1.7rem] bg-gradient-to-r from-cyan-500 via-sky-500 to-emerald-500 p-4 text-white">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -310,9 +344,9 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
               <p className="mb-3 text-sm text-slate-600">{currentActivitySummary}</p>
-              {!hasGeminiConfig() && (
+              {!isGeminiReady && (
                 <p className="mb-3 text-xs font-medium text-amber-700">
-                  Live Gemini replies are off until `VITE_GEMINI_API_KEY` is set.
+                  Live Gemini replies are off until `GEMINI_API_KEY` is set on the backend.
                 </p>
               )}
               <button
@@ -351,14 +385,46 @@ const ChatbotHelper: React.FC<ChatbotHelperProps> = ({
         </div>
       )}
 
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed bottom-6 right-4 z-50 flex items-center gap-3 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 px-5 py-4 text-white shadow-2xl transition-transform hover:scale-105"
-        aria-label={isOpen ? 'Hide chatbot helper' : 'Open chatbot helper'}
+      <div
+        className="fixed bottom-5 right-4 z-50 flex items-end gap-3"
+        style={{
+          transform: `translate(${companionOffset.x}px, ${companionOffset.y}px)`,
+        }}
       >
-        <MessageCircle className="h-5 w-5" />
-        <span className="font-semibold">{isOpen ? 'Hide helper' : 'Ask MiniAI'}</span>
-      </button>
+        {!isOpen && (
+          <div className="max-w-[10rem] rounded-2xl border border-cyan-200 bg-white/90 px-3 py-2 text-sm font-medium text-slate-700 shadow-[0_16px_30px_rgba(14,116,144,0.18)] backdrop-blur-sm animate-[robot-bubble_4s_ease-in-out_infinite]">
+            Need help? Tap me and I will follow along.
+          </div>
+        )}
+
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="group relative h-24 w-24 rounded-[2rem] border-4 border-cyan-200 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.98),rgba(186,230,253,0.92)_40%,rgba(52,211,153,0.88)_100%)] shadow-[0_18px_40px_rgba(14,116,144,0.28)] transition-transform duration-300 hover:scale-105"
+          aria-label={isOpen ? 'Hide chatbot helper' : 'Open chatbot helper'}
+        >
+          <span className="absolute left-1/2 top-[-0.8rem] h-6 w-2 -translate-x-1/2 rounded-full bg-cyan-300"></span>
+          <span className="absolute left-1/2 top-[-1.25rem] h-4 w-4 -translate-x-1/2 rounded-full bg-amber-300 shadow-[0_0_16px_rgba(253,224,71,0.9)]"></span>
+          <span className="absolute inset-x-5 top-5 h-10 rounded-[1.25rem] border border-cyan-100 bg-slate-900/85">
+            <span className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.95)] transition-transform duration-300 group-hover:translate-x-1"></span>
+            <span className="absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.95)] transition-transform duration-300 group-hover:-translate-x-1"></span>
+          </span>
+          <span className="absolute inset-x-7 bottom-5 h-3 rounded-full bg-white/70">
+            <span className="absolute inset-x-2 top-1/2 h-1 -translate-y-1/2 rounded-full bg-emerald-400"></span>
+          </span>
+          <span className="absolute left-3 top-9 h-7 w-2 rounded-full bg-cyan-200/90 rotate-[18deg]"></span>
+          <span className="absolute right-3 top-9 h-7 w-2 rounded-full bg-cyan-200/90 -rotate-[18deg]"></span>
+          <span className="absolute bottom-[-0.45rem] left-6 h-4 w-2 rounded-full bg-cyan-300"></span>
+          <span className="absolute bottom-[-0.45rem] right-6 h-4 w-2 rounded-full bg-cyan-300"></span>
+          <span className="absolute inset-0 rounded-[2rem] border border-white/50"></span>
+        </button>
+      </div>
+
+      <style>{`
+        @keyframes robot-bubble {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-4px); }
+        }
+      `}</style>
     </>
   );
 };

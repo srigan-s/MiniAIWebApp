@@ -9,11 +9,13 @@ interface UserFormProps {
 }
 
 const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData }) => {
+  const passwordRequirements = /^(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
   const [formData, setFormData] = useState({
     name: initialData.name || '',
     age: initialData.age || '',
     email: initialData.email || '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -26,16 +28,21 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
       newErrors.name = 'Name is required';
     }
 
-    if (!formData.age || Number(formData.age) < 5 || Number(formData.age) > 18) {
-      newErrors.age = 'Age must be between 5 and 18';
+    const age = Number(formData.age);
+    if (!formData.age || !Number.isInteger(age) || age <= 12) {
+      newErrors.age = 'Age must be 12 or older';
     }
 
     if (!formData.email.trim() || !formData.email.includes('@')) {
       newErrors.email = 'Please enter a valid email';
     }
 
-    if (!formData.password || formData.password.length < 4) {
-      newErrors.password = 'Password must be at least 4 characters';
+    if (!passwordRequirements.test(formData.password)) {
+      newErrors.password = 'Password must be at least 6 characters and include a number and special character';
+    }
+
+    if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = 'Passwords must match';
     }
 
     setErrors(newErrors);
@@ -63,9 +70,8 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
       </div>
 
       <div className="relative w-full max-w-md z-10">
-        <div className="relative bg-emerald-50/80 backdrop-blur-xl rounded-[2rem] shadow-[0_0_45px_rgba(16,185,129,0.16)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in">
-          <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(16,185,129,0.2)_0%,rgba(34,211,238,0.2)_35%,rgba(99,102,241,0.2)_65%,rgba(16,185,129,0.2)_100%)]"></div>
-          <div className="absolute inset-y-0 -left-[60%] w-[85%] opacity-70 bg-[linear-gradient(110deg,rgba(134,239,172,0.85)_0%,rgba(187,247,208,0.85)_40%,rgba(221,214,254,0.9)_75%,rgba(196,181,253,0.9)_100%)] blur-[1px] animate-scan-color"></div>
+        <div className="relative bg-white/72 backdrop-blur-xl rounded-[2rem] shadow-[0_0_45px_rgba(16,185,129,0.14)] p-8 border border-emerald-200/70 overflow-hidden animate-rise-in">
+          <div className="absolute inset-0 opacity-35 bg-[linear-gradient(120deg,transparent_0%,#6ee7b7_50%,transparent_100%)] animate-scan"></div>
 
           <button
             type="button"
@@ -100,9 +106,9 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
 
             <div>
               <label htmlFor="age" className="block text-lg font-semibold text-emerald-900 mb-2">How old are you? 🎂</label>
-              <input type="number" id="age" value={formData.age} onChange={(e) => setFormData((prev) => ({ ...prev, age: e.target.value }))}
+                <input type="number" id="age" value={formData.age} onChange={(e) => setFormData((prev) => ({ ...prev, age: e.target.value }))}
                 className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                placeholder="Your age" min={5} max={18} />
+                placeholder="Your age" min={12} step={1} />
               {errors.age && <p className="text-rose-600 text-sm mt-1">{errors.age}</p>}
             </div>
 
@@ -120,13 +126,38 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
                 <input type={showPassword ? 'text' : 'password'} id="password" value={formData.password}
                   onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                   className="w-full px-4 py-3 pr-12 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                  placeholder="Enter a password" minLength={4} />
+                  placeholder="Enter a password" minLength={6} />
                 <button type="button" onClick={() => setShowPassword((prev) => !prev)} aria-label={showPassword ? 'Hide password' : 'Show password'}
                   className="absolute inset-y-0 right-0 flex items-center px-4 text-emerald-600 hover:text-emerald-700 transition-colors duration-200">
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && <p className="text-rose-600 text-sm mt-1">{errors.password}</p>}
+              <p className="text-emerald-800/80 text-sm mt-1">Use at least 6 characters with a number and a special character.</p>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-lg font-semibold text-emerald-900 mb-2">Enter your password again 🔐</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="w-full px-4 py-3 pr-12 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
+                  placeholder="Re-enter your password"
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute inset-y-0 right-0 flex items-center px-4 text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="text-rose-600 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
 
             <button type="submit" className="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-[0_10px_24px_rgba(16,185,129,0.3)]">
@@ -144,10 +175,9 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
         @keyframes float-delay { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(20px); } }
         @keyframes pulse-glow { 0%, 100% { opacity: 0.4; transform: scale(0.9); } 50% { opacity: 0.9; transform: scale(1.08); } }
         @keyframes rise-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scan-color {
-          0% { transform: translate3d(0, 0, 0) scaleX(1); filter: hue-rotate(0deg) saturate(1.02); }
-          50% { transform: translate3d(86%, 0, 0) scaleX(1.03); filter: hue-rotate(10deg) saturate(1.1); }
-          100% { transform: translate3d(172%, 0, 0) scaleX(1); filter: hue-rotate(0deg) saturate(1.02); }
+        @keyframes scan {
+          0% { transform: translateX(-120%); }
+          100% { transform: translateX(120%); }
         }
         @keyframes button-shimmer { 0% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
         .animate-spin-slow { animation: spin-slow 10s linear infinite; }
@@ -156,7 +186,7 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
         .animate-float-delay { animation: float-delay 10s ease-in-out infinite; }
         .animate-pulse-glow { animation: pulse-glow 9s ease-in-out infinite; }
         .animate-rise-in { animation: rise-in 0.65s ease-out forwards; }
-        .animate-scan-color { animation: scan-color 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        .animate-scan { animation: scan 6s linear infinite; }
         .animate-button-shimmer { animation: button-shimmer 2.8s linear infinite; }
       `}</style>
     </div>

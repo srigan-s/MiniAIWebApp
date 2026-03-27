@@ -1,4 +1,7 @@
 import { games, lessons } from '../data/learningContent';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 type ChatRole = 'user' | 'assistant';
 
 interface RequestMessage {
@@ -12,8 +15,13 @@ interface GeminiChatContext {
   recommendation: string;
 }
 
-const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+type ChatStatusResponse = {
+  configured: boolean;
+};
+
+type ChatReplyResponse = {
+  reply: string;
+};
 
 const buildSystemPrompt = (context: GeminiChatContext) => {
   const lessonGuide = lessons
@@ -46,75 +54,41 @@ Games:
 ${gameGuide}`;
 };
 
-export const hasGeminiConfig = () => Boolean(GEMINI_API_KEY);
+const parseError = async (response: Response) => {
+  const data = (await response.json().catch(() => null)) as { error?: string } | null;
+  return data?.error || 'Gemini request failed.';
+};
+
+export const hasGeminiConfig = async () => {
+  const response = await fetch(`${API_BASE_URL}/chat/status`);
+
+  if (!response.ok) {
+    return false;
+  }
+
+  const data = (await response.json()) as ChatStatusResponse;
+  return data.configured;
+};
 
 export const requestGeminiChatReply = async (
   messages: RequestMessage[],
   context: GeminiChatContext
 ) => {
-  if (!GEMINI_API_KEY) {
-    throw new Error('Missing VITE_GEMINI_API_KEY');
-  }
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: buildSystemPrompt(context) }],
-        },
-        contents: messages.map((message) => ({
-          role: message.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: message.text }],
-        })),
-      }),
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/chat/gemini`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messages,
+      systemPrompt: buildSystemPrompt(context),
+    }),
+  });
 
   if (!response.ok) {
-    const errorText = await response.text();
-
-    try {
-      const parsedError = JSON.parse(errorText) as {
-        error?: {
-          code?: number;
-          message?: string;
-          status?: string;
-        };
-      };
-      throw new Error(parsedError.error?.message || parsedError.error?.status || errorText);
-    } catch {
-      throw new Error(errorText || 'Gemini request failed');
-    }
+    throw new Error(await parseError(response));
   }
 
-  const data = (await response.json()) as {
-    candidates?: Array<{
-      content?: {
-        parts?: Array<{
-          text?: string;
-        }>;
-      };
-    }>;
-    promptFeedback?: {
-      blockReason?: string;
-    };
-  };
-
-  if (data.promptFeedback?.blockReason) {
-    return 'I could not answer that request right now. Please try asking about AI lessons, games, or your progress.';
-  }
-
-  const outputText = data.candidates
-    ?.flatMap((candidate) => candidate.content?.parts ?? [])
-    .map((part) => part.text?.trim() || '')
-    .filter(Boolean)
-    .join('\n')
-    .trim();
-
-  return outputText || 'I could not generate a response right now.';
+  const data = (await response.json()) as ChatReplyResponse;
+  return data.reply || 'I could not generate a response right now.';
 };

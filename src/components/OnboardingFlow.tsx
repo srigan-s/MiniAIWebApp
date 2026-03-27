@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types';
+import { signupUser } from '../lib/authApi';
 import AvatarSelection from './onboarding/AvatarSelection';
 import UserForm from './onboarding/UserForm';
 import ParentalConsent from './onboarding/ParentalConsent';
@@ -13,31 +14,42 @@ interface OnboardingFlowProps {
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, onBackToLogin }) => {
   const [step, setStep] = useState(1);
   const [userData, setUserData] = useState<Partial<User>>({});
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleStepComplete = (data: Partial<User>) => {
+  const handleStepComplete = async (data: Partial<User>) => {
+    setError('');
     setUserData(prev => ({ ...prev, ...data }));
     
     if (step < 4) {
       setStep(step + 1);
     } else {
-      // Complete onboarding
-      const fullUser: User = {
-        id: Date.now().toString(),
-        name: data.name || '',
-        age: data.age || 0,
-        email: data.email || '',
-        avatar: data.avatar || '🤖',
-        parentalConsent: data.parentalConsent || false,
-        xp: 0,
-        level: 1,
-        badges: [],
-        completedLessons: [],
-        completedGames: [],
-        createdAt: new Date(),
+      const completeUserData = {
         ...userData,
-        ...data
+        ...data,
       };
-      onComplete(fullUser);
+
+      setIsSubmitting(true);
+
+      try {
+        const createdUser = await signupUser({
+          name: completeUserData.name || '',
+          age: completeUserData.age || 0,
+          email: completeUserData.email || '',
+          password: completeUserData.password || '',
+          avatar: completeUserData.avatar || 'mini',
+          parentalConsent: completeUserData.parentalConsent || false,
+        });
+        onComplete(createdUser);
+      } catch (submissionError) {
+        setError(
+          submissionError instanceof Error
+            ? submissionError.message
+            : 'Could not create your account right now.'
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -49,7 +61,13 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, onBackToLog
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className={`w-full ${step === 2 ? 'max-w-6xl' : 'max-w-md'}`}>
+        {error && (
+          <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {error}
+          </div>
+        )}
+
         {step === 1 && (
           <UserForm 
             onNext={handleStepComplete}
@@ -77,7 +95,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, onBackToLog
         {step === 4 && (
           <Welcome 
             onComplete={handleStepComplete}
+            onBack={handleBack}
             userData={userData}
+            isSubmitting={isSubmitting}
           />
         )}
       </div>

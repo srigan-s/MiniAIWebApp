@@ -3,7 +3,7 @@ export interface User {
   name: string;
   age: number;
   email: string;
-  password: string;
+  password?: string;
   avatar: string;
   parentalConsent: boolean;
   xp: number;
@@ -11,7 +11,7 @@ export interface User {
   badges: Badge[];
   completedLessons: number[];
   completedGames: string[];
-  createdAt: Date;
+  createdAt: Date | string;
 }
 
 export interface Badge {
@@ -19,7 +19,7 @@ export interface Badge {
   name: string;
   description: string;
   icon: string;
-  unlockedAt: Date;
+  unlockedAt: Date | string;
 }
 
 export interface Lesson {
@@ -53,6 +53,6 @@ export interface MiniGameConfig {
   id: string;
   title: string;
   description: string;
-  type: 'robot-training' | 'data-sorting' | 'quiz-battle' | 'neural-network-builder' | 'image-classifier' | 'bias-detector';
+  type: 'robot-training' | 'data-sorting' | 'quiz-battle' | 'neural-network-builder' | 'image-classifier' | 'bias-detector' | 'language-lab';
   xpReward: number;
 }
