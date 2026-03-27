@@ -1,16 +1,33 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import { User, Badge } from '../types';
 import { syncUserProgress } from '../lib/authApi';
+import { games, lessons } from '../data/learningContent';
 
 const USER_STORAGE_KEY = 'aiLearningUserSession';
+
+export interface BadgeToast {
+  id: string;
+  badge: Badge;
+}
+
+export interface LevelCelebration {
+  id: string;
+  level: number;
+  missionLabel: string;
+  avatarId?: string;
+}
 
 interface UserContextType {
   user: User | null;
   updateUser: (updates: Partial<User>) => void;
   addXP: (amount: number) => void;
   addBadge: (badge: Badge) => void;
-  completeLesson: (lessonId: number) => void;
-  completeGame: (gameId: string) => void;
+  completeLesson: (lessonId: number, xpReward: number) => void;
+  completeGame: (gameId: string, xpReward: number) => void;
+  badgeToasts: BadgeToast[];
+  dismissBadgeToast: (toastId: string) => void;
+  levelCelebration: LevelCelebration | null;
+  dismissLevelCelebration: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -27,7 +44,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
   children, 
   initialUser 
 }) => {
-  const [user, setUser] = useState<User | null>(initialUser);
+  const normalizeUserLevel = (nextUser: User | null) => {
+    if (!nextUser) {
+      return nextUser;
+    }
+
+    return {
+      ...nextUser,
+      level: nextUser.completedLessons.length + nextUser.completedGames.length + 1,
+    };
+  };
+
+  const [user, setUser] = useState<User | null>(normalizeUserLevel(initialUser));
+  const [badgeToasts, setBadgeToasts] = useState<BadgeToast[]>([]);
+  const [levelCelebration, setLevelCelebration] = useState<LevelCelebration | null>(null);
   const syncQueueRef = useRef(Promise.resolve());
 
   const persistUserSession = (nextUser: User) => {
@@ -98,71 +128,175 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
   const addXP = (amount: number) => {
     applyUserUpdate((currentUser) => {
       const newXP = currentUser.xp + amount;
-      const newLevel = Math.floor(newXP / 100) + 1;
-      const hasMilestoneBadge = currentUser.badges.some((badge) => badge.id === 'xp-milestone-100');
-
-      const badges = hasMilestoneBadge || newXP < 100
-        ? currentUser.badges
-        : [
-            ...currentUser.badges,
-            {
-              id: 'xp-milestone-100',
-              name: 'XP Master',
-              description: 'Earned 100 XP!',
-              icon: '🏆',
-              unlockedAt: new Date(),
-            },
-          ];
 
       return {
         ...currentUser,
         xp: newXP,
-        level: newLevel,
-        badges,
       };
     });
   };
 
-  const completeLesson = (lessonId: number) => {
-    applyUserUpdate((currentUser) => {
-      if (currentUser.completedLessons.includes(lessonId)) {
+  const createBadge = (id: string, name: string, description: string, icon: string): Badge => ({
+    id,
+    name,
+    description,
+    icon,
+    unlockedAt: new Date(),
+  });
+
+  const getUnlockedBadges = (
+    currentUser: User,
+    completedLessons: number[],
+    completedGames: string[],
+    nextXP: number
+  ) => {
+    const earnedIds = new Set(currentUser.badges.map((badge) => badge.id));
+    const totalCompleted = completedLessons.length + completedGames.length;
+    const newBadges: Badge[] = [];
+
+    const unlock = (badge: Badge, condition: boolean) => {
+      if (!condition || earnedIds.has(badge.id)) {
+        return;
+      }
+
+      earnedIds.add(badge.id);
+      newBadges.push(badge);
+    };
+
+    unlock(
+      createBadge('first-lesson', 'First Steps', 'Completed your first lesson!', '🌟'),
+      completedLessons.length >= 1
+    );
+    unlock(
+      createBadge('first-game', 'Game On', 'Played your first AI challenge game!', '🎮'),
+      completedGames.length >= 1
+    );
+    unlock(
+      createBadge('lesson-explorer', 'Lesson Explorer', 'Completed 3 learning adventures.', '🧭'),
+      completedLessons.length >= 3
+    );
+    unlock(
+      createBadge('challenge-starter', 'Challenge Starter', 'Completed 3 AI challenge games.', '⚡'),
+      completedGames.length >= 3
+    );
+    unlock(
+      createBadge('halfway-hero', 'Halfway Hero', 'Reached the halfway point of the full quest path.', '🚀'),
+      totalCompleted >= Math.ceil((lessons.length + games.length) / 2)
+    );
+    unlock(
+      createBadge('visionary-scholar', 'Visionary Scholar', 'Finished every learning adventure.', '🎓'),
+      completedLessons.length === lessons.length
+    );
+    unlock(
+      createBadge('challenge-champion', 'Challenge Champion', 'Finished every AI challenge game.', '🏅'),
+      completedGames.length === games.length
+    );
+    unlock(
+      createBadge('xp-milestone-100', 'XP Master', 'Earned 100 XP!', '🏆'),
+      nextXP >= 100
+    );
+    unlock(
+      createBadge('xp-milestone-250', 'XP Rocket', 'Blasted past 250 XP.', '✨'),
+      nextXP >= 250
+    );
+    unlock(
+      createBadge('xp-milestone-500', 'XP Legend', 'Collected 500 XP in your adventure.', '👑'),
+      nextXP >= 500
+    );
+    unlock(
+      createBadge('quest-master', 'Quest Master', 'Completed every lesson and challenge on the map.', '🗺️'),
+      completedLessons.length === lessons.length && completedGames.length === games.length
+    );
+
+    return newBadges;
+  };
+
+  const completeMission = ({
+    lessonId,
+    gameId,
+    xpReward,
+  }: {
+    lessonId?: number;
+    gameId?: string;
+    xpReward: number;
+  }) => {
+    let queuedToasts: BadgeToast[] = [];
+    let queuedCelebration: LevelCelebration | null = null;
+
+    setUser((currentUser) => {
+      if (!currentUser) {
         return currentUser;
       }
 
-      const completedLessons = [...currentUser.completedLessons, lessonId];
-      const hasFirstLessonBadge = currentUser.badges.some((badge) => badge.id === 'first-lesson');
-      const badges = hasFirstLessonBadge
-        ? currentUser.badges
-        : [
-            ...currentUser.badges,
-            {
-              id: 'first-lesson',
-              name: 'First Steps',
-              description: 'Completed your first lesson!',
-              icon: '🌟',
-              unlockedAt: new Date(),
-            },
-          ];
+      if (typeof lessonId === 'number' && currentUser.completedLessons.includes(lessonId)) {
+        return currentUser;
+      }
 
-      return {
+      if (typeof gameId === 'string' && currentUser.completedGames.includes(gameId)) {
+        return currentUser;
+      }
+
+      const completedLessons = typeof lessonId === 'number'
+        ? [...currentUser.completedLessons, lessonId]
+        : currentUser.completedLessons;
+      const completedGames = typeof gameId === 'string'
+        ? [...currentUser.completedGames, gameId]
+        : currentUser.completedGames;
+      const xp = currentUser.xp + xpReward;
+      const level = completedLessons.length + completedGames.length + 1;
+      const newBadges = getUnlockedBadges(currentUser, completedLessons, completedGames, xp);
+      const missionLabel = typeof lessonId === 'number'
+        ? lessons.find((lesson) => lesson.id === lessonId)?.title ?? 'Learning adventure'
+        : games.find((game) => game.id === gameId)?.title ?? 'AI challenge';
+
+      queuedToasts = newBadges.map((badge) => ({
+        id: `${badge.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        badge,
+      }));
+      queuedCelebration = {
+        id: `level-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        level,
+        missionLabel,
+        avatarId: currentUser.avatar,
+      };
+
+      const nextUser = {
         ...currentUser,
+        xp,
+        level,
         completedLessons,
-        badges,
+        completedGames,
+        badges: [...currentUser.badges, ...newBadges],
       };
+
+      persistUserSession(nextUser);
+      enqueueProgressSync(nextUser);
+      return nextUser;
     });
+
+    if (queuedToasts.length > 0) {
+      setBadgeToasts((currentToasts) => [...currentToasts, ...queuedToasts]);
+    }
+
+    if (queuedCelebration) {
+      setLevelCelebration(queuedCelebration);
+    }
   };
 
-  const completeGame = (gameId: string) => {
-    applyUserUpdate((currentUser) => {
-      if (currentUser.completedGames.includes(gameId)) {
-        return currentUser;
-      }
+  const completeLesson = (lessonId: number, xpReward: number) => {
+    completeMission({ lessonId, xpReward });
+  };
 
-      return {
-        ...currentUser,
-        completedGames: [...currentUser.completedGames, gameId],
-      };
-    });
+  const completeGame = (gameId: string, xpReward: number) => {
+    completeMission({ gameId, xpReward });
+  };
+
+  const dismissBadgeToast = (toastId: string) => {
+    setBadgeToasts((currentToasts) => currentToasts.filter((toast) => toast.id !== toastId));
+  };
+
+  const dismissLevelCelebration = () => {
+    setLevelCelebration(null);
   };
 
   return (
@@ -172,7 +306,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
       addXP,
       addBadge,
       completeLesson,
-      completeGame
+      completeGame,
+      badgeToasts,
+      dismissBadgeToast,
+      levelCelebration,
+      dismissLevelCelebration,
     }}>
       {children}
     </UserContext.Provider>

@@ -14,11 +14,10 @@ interface MiniGameProps {
 }
 
 const MiniGame: React.FC<MiniGameProps> = ({ gameId, onComplete }) => {
-  const { addXP, completeGame } = useUser();
+  const { completeGame } = useUser();
 
   const handleGameComplete = (xpReward: number) => {
-    addXP(xpReward);
-    completeGame(gameId);
+    completeGame(gameId, xpReward);
     
     setTimeout(() => {
       onComplete();

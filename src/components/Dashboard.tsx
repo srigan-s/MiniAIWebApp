@@ -6,6 +6,7 @@ import BadgeDisplay from './dashboard/BadgeDisplay';
 import CharacterEvolution from './dashboard/CharacterEvolution';
 import LessonCard from './dashboard/LessonCard';
 import GameCard from './dashboard/GameCard';
+import AdventureMap from './dashboard/AdventureMap';
 import { games, gameSequence, lessons, lessonSequence } from '../data/learningContent';
 
 interface DashboardProps {
@@ -50,51 +51,72 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
 
   return (
     <div className="space-y-8">
-      {/* Welcome Section */}
-      <div className="bg-white rounded-3xl shadow-xl p-8 border-4 border-emerald-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
-              Welcome back, {user.name}! 👋
+      <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-[#fffaf1]/95 p-5 shadow-[0_30px_80px_rgba(14,116,144,0.14)] sm:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(125,211,252,0.26),_transparent_28%),radial-gradient(circle_at_85%_15%,_rgba(251,146,60,0.18),_transparent_22%),linear-gradient(135deg,_rgba(255,255,255,0.8),_rgba(255,255,255,0.45))]" />
+        <div className="relative z-10 flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100/90 px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-sky-700">
+              Mission Control
+            </div>
+            <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+              Welcome back, {user.name}! Build your AI path your own way.
             </h1>
-            <p className="text-xl text-gray-600">Ready to learn more about AI?</p>
+            <p className="mt-3 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
+              Explore bright lesson worlds, follow the quest trail, and jump into challenge games when you are ready.
+            </p>
           </div>
-          <CharacterEvolution user={user} />
-        </div>
-        
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl p-6 text-center">
-            <Star className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-            <div className="text-3xl font-bold text-emerald-700">{user.xp}</div>
-            <div className="text-emerald-600 font-medium">Total XP</div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl p-6 text-center">
-            <Trophy className="w-10 h-10 text-yellow-600 mx-auto mb-2" />
-            <div className="text-3xl font-bold text-yellow-700">{user.level}</div>
-            <div className="text-yellow-600 font-medium">Level</div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 text-center">
-            <Target className="w-10 h-10 text-purple-600 mx-auto mb-2" />
-            <div className="text-3xl font-bold text-purple-700">{user.badges.length}</div>
-            <div className="text-purple-600 font-medium">Badges</div>
+
+          <div className="mx-auto xl:mx-0">
+            <CharacterEvolution user={user} />
           </div>
         </div>
 
-        <div className="mt-6">
+        <div className="relative z-10 mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="rounded-[1.75rem] border border-emerald-200 bg-gradient-to-br from-emerald-100 to-emerald-50 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+            <Star className="mx-auto mb-3 h-10 w-10 text-emerald-700" />
+            <div className="text-3xl font-black text-emerald-800">{user.xp}</div>
+            <div className="font-semibold text-emerald-700">Total XP</div>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-amber-200 bg-gradient-to-br from-amber-100 to-orange-50 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+            <Trophy className="mx-auto mb-3 h-10 w-10 text-amber-700" />
+            <div className="text-3xl font-black text-amber-800">{user.level}</div>
+            <div className="font-semibold text-amber-700">Explorer Level</div>
+          </div>
+
+          <div className="rounded-[1.75rem] border border-rose-200 bg-gradient-to-br from-rose-100 to-fuchsia-50 p-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+            <Target className="mx-auto mb-3 h-10 w-10 text-rose-700" />
+            <div className="text-3xl font-black text-rose-800">{user.badges.length}</div>
+            <div className="font-semibold text-rose-700">Treasure Badges</div>
+          </div>
+        </div>
+
+        <div className="relative z-10 mt-6 rounded-[1.75rem] border border-slate-200 bg-white/80 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur">
           <ProgressBar progress={progressPercentage} totalActivities={totalActivities} completedActivities={completedActivities} />
         </div>
       </div>
 
-      {/* Learning Modules */}
-      <div className="bg-white rounded-3xl shadow-xl p-8 border-4 border-cyan-200">
-        <div className="flex items-center mb-6">
-          <BookOpen className="w-8 h-8 text-cyan-600 mr-3" />
-          <h2 className="text-3xl font-bold text-gray-800">Learning Adventures</h2>
+      <div className="relative overflow-hidden rounded-[2rem] border border-cyan-100/80 bg-white/90 p-5 shadow-[0_24px_70px_rgba(14,116,144,0.14)] backdrop-blur sm:p-8">
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-cyan-100/80 via-sky-100/50 to-teal-100/70" />
+        <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl bg-cyan-500 p-3 text-white shadow-lg shadow-cyan-200">
+                <BookOpen className="h-7 w-7" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-black tracking-tight text-slate-900">Learning Adventures</h2>
+                <p className="text-sm text-slate-600 sm:text-base">Pick a lesson card to learn core ideas before jumping into challenge mode.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="inline-flex items-center rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-semibold text-cyan-700">
+            {user.completedLessons.length}/{lessons.length} lessons finished
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div className="relative z-10 mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {orderedLessons.map((lesson) => {
             const isCompleted = user.completedLessons.includes(lesson.id);
             const isLocked = isLessonLocked(lesson.id);
@@ -112,14 +134,25 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
         </div>
       </div>
 
-      {/* Mini Games */}
-      <div className="bg-white rounded-3xl shadow-xl p-8 border-4 border-orange-200">
-        <div className="flex items-center mb-6">
-          <Gamepad2 className="w-8 h-8 text-orange-600 mr-3" />
-          <h2 className="text-3xl font-bold text-gray-800">AI Challenge Games</h2>
+      <div className="relative overflow-hidden rounded-[2rem] border border-orange-100/90 bg-white/[0.92] p-5 shadow-[0_24px_70px_rgba(249,115,22,0.12)] backdrop-blur sm:p-8">
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-orange-100/80 via-amber-50 to-rose-100/70" />
+        <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="rounded-2xl bg-orange-500 p-3 text-white shadow-lg shadow-orange-200">
+              <Gamepad2 className="h-7 w-7" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-black tracking-tight text-slate-900">AI Challenge Games</h2>
+              <p className="text-sm text-slate-600 sm:text-base">Practice what you learned with more hands-on, high-energy mini games.</p>
+            </div>
+          </div>
+
+          <div className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-700">
+            {user.completedGames.length}/{games.length} games completed
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div className="relative z-10 mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {orderedGames.map((game) => {
             const isCompleted = user.completedGames.includes(game.id);
             const isLocked = isGameLocked(game.id);
@@ -137,7 +170,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartLesson, onStartGame }) => 
         </div>
       </div>
 
-      {/* Badges Section */}
+      <AdventureMap
+        lessons={orderedLessons}
+        games={orderedGames}
+        completedLessons={user.completedLessons}
+        completedGames={user.completedGames}
+        isLessonLocked={isLessonLocked}
+        isGameLocked={isGameLocked}
+        onStartLesson={onStartLesson}
+        onStartGame={onStartGame}
+      />
+
       <BadgeDisplay badges={user.badges} />
     </div>
   );

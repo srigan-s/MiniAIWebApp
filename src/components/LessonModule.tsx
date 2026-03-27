@@ -14,13 +14,12 @@ interface LessonModuleProps {
 }
 
 const LessonModule: React.FC<LessonModuleProps> = ({ lessonId, onComplete }) => {
-  const { addXP, completeLesson } = useUser();
+  const { completeLesson } = useUser();
   const [isCompleted, setIsCompleted] = useState(false);
 
   const handleLessonComplete = (xpReward: number) => {
     if (!isCompleted) {
-      addXP(xpReward);
-      completeLesson(lessonId);
+      completeLesson(lessonId, xpReward);
       setIsCompleted(true);
       
       // Delay before returning to dashboard to show completion animation

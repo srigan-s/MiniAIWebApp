@@ -16,52 +16,62 @@ interface LessonCardProps {
 
 const LessonCard: React.FC<LessonCardProps> = ({ lesson, isCompleted, isLocked, onStart }) => {
   const cardStyle = isLocked
-    ? 'bg-gray-100 border-gray-300 shadow-sm cursor-not-allowed opacity-80'
+    ? 'border-slate-200 bg-slate-100/90 shadow-none cursor-not-allowed opacity-80'
     : isCompleted
-      ? 'bg-green-50 border-green-200 shadow-lg cursor-pointer'
-      : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200 shadow-md hover:shadow-xl cursor-pointer';
+      ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50 shadow-[0_22px_55px_rgba(16,185,129,0.18)] cursor-pointer'
+      : 'border-cyan-200 bg-[linear-gradient(160deg,_rgba(236,254,255,0.95),_rgba(224,242,254,0.95)_55%,_rgba(255,255,255,0.92))] shadow-[0_22px_55px_rgba(14,165,233,0.16)] hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(14,165,233,0.22)] cursor-pointer';
 
-  const iconStyle = isLocked ? 'bg-gray-200' : isCompleted ? 'bg-green-200' : 'bg-cyan-200';
+  const iconStyle = isLocked
+    ? 'bg-slate-200 text-slate-500'
+    : isCompleted
+      ? 'bg-emerald-200 text-emerald-900'
+      : 'bg-cyan-200 text-cyan-900';
 
   return (
     <div
-      className={`rounded-2xl p-6 border-3 transition-all duration-200 ${isLocked ? '' : 'hover:scale-105'} ${cardStyle}`}
+      className={`group relative overflow-hidden rounded-[1.75rem] border p-6 transition-all duration-300 ${cardStyle}`}
       onClick={() => {
         if (!isLocked) {
           onStart();
         }
       }}
     >
-      <div className="text-center mb-4">
-        <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl ${iconStyle}`}>
+      <div className="absolute right-0 top-0 h-20 w-24 rounded-bl-[2.5rem] bg-white/40" />
+      <div className="relative z-10 mb-5 flex items-start justify-between gap-4">
+        <div className={`flex h-16 w-16 items-center justify-center rounded-[1.4rem] text-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] ${iconStyle}`}>
           {lesson.icon}
         </div>
-      </div>
-      
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{lesson.title}</h3>
-      <p className="text-gray-600 text-sm mb-4">{lesson.description}</p>
-      
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-1">
-          <Star className="w-4 h-4 text-yellow-500" />
-          <span className="text-sm font-medium text-gray-700">{lesson.xpReward} XP</span>
+        <div className="rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
+          Lesson
         </div>
-        
-        {isCompleted ? (
-          <div className="flex items-center space-x-1 text-green-600">
-            <CheckCircle className="w-5 h-5" />
-            <span className="text-sm font-medium">Completed</span>
+      </div>
+
+      <div className="relative z-10">
+        <h3 className="text-xl font-black tracking-tight text-slate-900">{lesson.title}</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-600">{lesson.description}</p>
+
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <div className="flex items-center space-x-1 rounded-full bg-amber-50 px-3 py-2">
+            <Star className="h-4 w-4 text-amber-500" />
+            <span className="text-sm font-bold text-amber-700">{lesson.xpReward} XP</span>
           </div>
-        ) : isLocked ? (
-          <div className="flex items-center space-x-1 text-gray-600 bg-gray-200 px-3 py-2 rounded-lg">
-            <Lock className="w-4 h-4" />
-            <span className="text-sm font-medium">Locked</span>
-          </div>
-        ) : (
-          <button className="bg-cyan-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-cyan-600 transition-colors duration-200">
-            Start
-          </button>
-        )}
+
+          {isCompleted ? (
+            <div className="flex items-center space-x-1 rounded-full bg-emerald-100 px-3 py-2 text-emerald-700">
+              <CheckCircle className="h-5 w-5" />
+              <span className="text-sm font-bold">Completed</span>
+            </div>
+          ) : isLocked ? (
+            <div className="flex items-center space-x-1 rounded-full bg-slate-200 px-3 py-2 text-slate-600">
+              <Lock className="h-4 w-4" />
+              <span className="text-sm font-bold">Locked</span>
+            </div>
+          ) : (
+            <span className="rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white transition-colors duration-200 group-hover:bg-cyan-700">
+              Start Adventure
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

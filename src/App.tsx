@@ -10,6 +10,9 @@ import LessonModule from './components/LessonModule';
 import MiniGame from './components/MiniGame';
 import Header from './components/Header';
 import ChatbotHelper from './components/ChatbotHelper';
+import BadgeToastContainer from './components/feedback/BadgeToastContainer';
+import LevelCelebrationModal from './components/feedback/LevelCelebrationModal';
+import { useUser } from './contexts/UserContext';
 import { loginUser } from './lib/authApi';
 const USER_STORAGE_KEY = 'aiLearningUserSession';
 
@@ -215,58 +218,97 @@ function App() {
     );
   }
 
-  const helperView: 'dashboard' | 'lesson' | 'game' =
-    currentView === 'lesson' || currentView === 'game' ? currentView : 'dashboard';
-
   return (
     <UserProvider initialUser={user}>
       <GameProvider>
-        <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
-          <FloatingBubbles />
-          <Header
-            onBackToDashboard={handleBackToDashboard}
-            showBackButton={currentView !== 'dashboard'}
-            onLogout={handleLogout}
-            onOpenProfile={handleOpenProfile}
-            isProfileView={currentView === 'profile'}
-          />
-          
-          <main className="container mx-auto px-4 py-8 relative z-10">
-            {currentView === 'dashboard' && (
-              <Dashboard 
-                onStartLesson={handleStartLesson}
-                onStartGame={handleStartGame}
-              />
-            )}
-
-            {currentView === 'profile' && <ProfilePage />}
-            
-            {currentView === 'lesson' && currentLesson !== null && (
-              <LessonModule 
-                lessonId={currentLesson}
-                onComplete={handleBackToDashboard}
-              />
-            )}
-            
-            {currentView === 'game' && currentGame && (
-              <MiniGame 
-                gameId={currentGame}
-                onComplete={handleBackToDashboard}
-              />
-            )}
-          </main>
-
-          <ChatbotHelper
-            currentView={helperView}
-            currentLesson={currentLesson}
-            currentGame={currentGame}
-            onStartLesson={handleStartLesson}
-            onStartGame={handleStartGame}
-          />
-        </div>
+        <AppShell
+          currentView={currentView}
+          currentLesson={currentLesson}
+          currentGame={currentGame}
+          handleBackToDashboard={handleBackToDashboard}
+          handleLogout={handleLogout}
+          handleOpenProfile={handleOpenProfile}
+          handleStartLesson={handleStartLesson}
+          handleStartGame={handleStartGame}
+        />
       </GameProvider>
     </UserProvider>
   );
 }
 
+const AppShell = ({
+  currentView,
+  currentLesson,
+  currentGame,
+  handleBackToDashboard,
+  handleLogout,
+  handleOpenProfile,
+  handleStartLesson,
+  handleStartGame,
+}: {
+  currentView: 'dashboard' | 'profile' | 'lesson' | 'game';
+  currentLesson: number | null;
+  currentGame: string | null;
+  handleBackToDashboard: () => void;
+  handleLogout: () => void;
+  handleOpenProfile: () => void;
+  handleStartLesson: (lessonId: number) => void;
+  handleStartGame: (gameId: string) => void;
+}) => {
+  const { badgeToasts, dismissBadgeToast, levelCelebration, dismissLevelCelebration } = useUser();
+
+  const helperView: 'dashboard' | 'lesson' | 'game' =
+    currentView === 'lesson' || currentView === 'game' ? currentView : 'dashboard';
+
+  return (
+    <div className="relative min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
+      <FloatingBubbles />
+      <Header
+        onBackToDashboard={handleBackToDashboard}
+        showBackButton={currentView !== 'dashboard'}
+        onLogout={handleLogout}
+        onOpenProfile={handleOpenProfile}
+        isProfileView={currentView === 'profile'}
+      />
+      
+      <main className="container mx-auto px-4 py-8 relative z-10">
+        {currentView === 'dashboard' && (
+          <Dashboard 
+            onStartLesson={handleStartLesson}
+            onStartGame={handleStartGame}
+          />
+        )}
+
+        {currentView === 'profile' && <ProfilePage />}
+        
+        {currentView === 'lesson' && currentLesson !== null && (
+          <LessonModule 
+            lessonId={currentLesson}
+            onComplete={handleBackToDashboard}
+          />
+        )}
+        
+        {currentView === 'game' && currentGame && (
+          <MiniGame 
+            gameId={currentGame}
+            onComplete={handleBackToDashboard}
+          />
+        )}
+      </main>
+
+      <BadgeToastContainer toasts={badgeToasts} onDismiss={dismissBadgeToast} />
+      <LevelCelebrationModal celebration={levelCelebration} onDismiss={dismissLevelCelebration} />
+
+      <ChatbotHelper
+        currentView={helperView}
+        currentLesson={currentLesson}
+        currentGame={currentGame}
+        onStartLesson={handleStartLesson}
+        onStartGame={handleStartGame}
+      />
+    </div>
+  );
+};
+
+ 
 export default App;
