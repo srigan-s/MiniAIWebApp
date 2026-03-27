@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from '../../types';
+import { RobotAvatar, getAvatarOptionById } from '../../lib/avatarOptions';
 
 interface WelcomeProps {
   onComplete: (data: Record<string, never>) => void;
@@ -8,6 +9,8 @@ interface WelcomeProps {
 }
 
 const Welcome: React.FC<WelcomeProps> = ({ onComplete, userData, isSubmitting = false }) => {
+  const avatar = getAvatarOptionById(userData.avatar);
+
   const handleStart = () => {
     onComplete({});
   };
@@ -15,13 +18,16 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete, userData, isSubmitting = 
   return (
     <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200">
       <div className="text-center">
-        <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl animate-bounce">
-          {userData.avatar || '🤖'}
+        <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-[2rem] bg-gradient-to-br from-white to-emerald-50 shadow-xl">
+          <RobotAvatar avatarId={avatar.id} size="xl" animated />
         </div>
         
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
           Welcome, {userData.name}! 🎉
         </h1>
+        <p className="mb-6 text-sm font-semibold uppercase tracking-[0.2em] text-cyan-700">
+          Your robot guide is {avatar.name}, {avatar.title}
+        </p>
         
         <div className="bg-gradient-to-r from-emerald-100 to-cyan-100 rounded-2xl p-6 mb-6">
           <p className="text-lg text-gray-700 mb-4">

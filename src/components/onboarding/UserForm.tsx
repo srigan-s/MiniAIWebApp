@@ -9,11 +9,13 @@ interface UserFormProps {
 }
 
 const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData }) => {
+  const passwordRequirements = /^(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
   const [formData, setFormData] = useState({
     name: initialData.name || '',
     age: initialData.age || '',
     email: initialData.email || '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -26,16 +28,21 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
       newErrors.name = 'Name is required';
     }
 
-    if (!formData.age || Number(formData.age) < 5 || Number(formData.age) > 18) {
-      newErrors.age = 'Age must be between 5 and 18';
+    const age = Number(formData.age);
+    if (!formData.age || !Number.isInteger(age) || age <= 5) {
+      newErrors.age = 'Age must be greater than 5';
     }
 
     if (!formData.email.trim() || !formData.email.includes('@')) {
       newErrors.email = 'Please enter a valid email';
     }
 
-    if (!formData.password || formData.password.length < 4) {
-      newErrors.password = 'Password must be at least 4 characters';
+    if (!passwordRequirements.test(formData.password)) {
+      newErrors.password = 'Password must be at least 6 characters and include a number and special character';
+    }
+
+    if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = 'Passwords must match';
     }
 
     setErrors(newErrors);
@@ -100,9 +107,9 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
 
             <div>
               <label htmlFor="age" className="block text-lg font-semibold text-emerald-900 mb-2">How old are you? 🎂</label>
-              <input type="number" id="age" value={formData.age} onChange={(e) => setFormData((prev) => ({ ...prev, age: e.target.value }))}
+                <input type="number" id="age" value={formData.age} onChange={(e) => setFormData((prev) => ({ ...prev, age: e.target.value }))}
                 className="w-full px-4 py-3 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                placeholder="Your age" min={5} max={18} />
+                placeholder="Your age" min={6} step={1} />
               {errors.age && <p className="text-rose-600 text-sm mt-1">{errors.age}</p>}
             </div>
 
@@ -120,13 +127,38 @@ const UserForm: React.FC<UserFormProps> = ({ onNext, onBackToLogin, initialData 
                 <input type={showPassword ? 'text' : 'password'} id="password" value={formData.password}
                   onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
                   className="w-full px-4 py-3 pr-12 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
-                  placeholder="Enter a password" minLength={4} />
+                  placeholder="Enter a password" minLength={6} />
                 <button type="button" onClick={() => setShowPassword((prev) => !prev)} aria-label={showPassword ? 'Hide password' : 'Show password'}
                   className="absolute inset-y-0 right-0 flex items-center px-4 text-emerald-600 hover:text-emerald-700 transition-colors duration-200">
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && <p className="text-rose-600 text-sm mt-1">{errors.password}</p>}
+              <p className="text-emerald-800/80 text-sm mt-1">Use at least 6 characters with a number and a special character.</p>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-lg font-semibold text-emerald-900 mb-2">Enter your password again 🔐</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="w-full px-4 py-3 pr-12 border border-emerald-200 bg-white/90 text-emerald-900 rounded-2xl focus:border-emerald-400 focus:outline-none focus:shadow-[0_0_18px_rgba(16,185,129,0.24)] text-lg transition-all duration-300"
+                  placeholder="Re-enter your password"
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute inset-y-0 right-0 flex items-center px-4 text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="text-rose-600 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
 
             <button type="submit" className="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all duration-300 shadow-[0_10px_24px_rgba(16,185,129,0.3)]">

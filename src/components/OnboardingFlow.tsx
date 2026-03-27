@@ -37,7 +37,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, onBackToLog
           age: completeUserData.age || 0,
           email: completeUserData.email || '',
           password: completeUserData.password || '',
-          avatar: completeUserData.avatar || '🤖',
+          avatar: completeUserData.avatar || 'mini',
           parentalConsent: completeUserData.parentalConsent || false,
         });
         onComplete(createdUser);
@@ -61,7 +61,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, onBackToLog
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+      <div className={`w-full ${step === 2 ? 'max-w-6xl' : 'max-w-md'}`}>
         {error && (
           <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             {error}

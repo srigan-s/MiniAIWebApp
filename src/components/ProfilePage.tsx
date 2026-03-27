@@ -2,6 +2,7 @@ import React from 'react';
 import { CalendarDays, Mail, ShieldCheck, Sparkles, Trophy, UserRound } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { games, lessons } from '../data/learningContent';
+import { RobotAvatar, getAvatarOptionById } from '../lib/avatarOptions';
 import BadgeDisplay from './dashboard/BadgeDisplay';
 import CharacterEvolution from './dashboard/CharacterEvolution';
 import ProgressBar from './dashboard/ProgressBar';
@@ -39,6 +40,7 @@ const ProfilePage: React.FC = () => {
   const completedGameTitles = games
     .filter((game) => user.completedGames.includes(game.id))
     .map((game) => game.title);
+  const avatar = getAvatarOptionById(user.avatar);
 
   return (
     <div className="space-y-8">
@@ -170,8 +172,14 @@ const ProfilePage: React.FC = () => {
               </div>
               <div className="rounded-2xl bg-emerald-50 p-4 border border-emerald-100">
                 <p className="text-sm font-semibold text-emerald-700">Avatar</p>
-                <div className="mt-2 inline-flex h-14 w-14 items-center justify-center rounded-full bg-white text-3xl shadow-sm">
-                  {user.avatar}
+                <div className="mt-2 flex items-center gap-4">
+                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-white shadow-sm">
+                    <RobotAvatar avatarId={user.avatar} size="md" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-800">{avatar.name}</p>
+                    <p className="text-sm text-gray-600">{avatar.title}</p>
+                  </div>
                 </div>
               </div>
               <div className="rounded-2xl bg-rose-50 p-4 border border-rose-100">

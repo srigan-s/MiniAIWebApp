@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft, LogOut, UserRound } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
+import { RobotAvatar } from '../lib/avatarOptions';
 
 interface HeaderProps {
   onBackToDashboard: () => void;
@@ -58,8 +59,8 @@ const Header: React.FC<HeaderProps> = ({
                   </span>
                 </div>
               </div>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-2xl shadow-lg">
-                {user.avatar}
+              <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-white shadow-lg">
+                <RobotAvatar avatarId={user.avatar} size="sm" />
               </div>
               <button
                 onClick={onOpenProfile}
