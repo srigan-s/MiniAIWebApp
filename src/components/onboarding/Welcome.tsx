@@ -1,14 +1,16 @@
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { User } from '../../types';
 import { RobotAvatar, getAvatarOptionById } from '../../lib/avatarOptions';
 
 interface WelcomeProps {
   onComplete: (data: Record<string, never>) => void;
+  onBack: () => void;
   userData: Partial<User>;
   isSubmitting?: boolean;
 }
 
-const Welcome: React.FC<WelcomeProps> = ({ onComplete, userData, isSubmitting = false }) => {
+const Welcome: React.FC<WelcomeProps> = ({ onComplete, onBack, userData, isSubmitting = false }) => {
   const avatar = getAvatarOptionById(userData.avatar);
 
   const handleStart = () => {
@@ -17,6 +19,14 @@ const Welcome: React.FC<WelcomeProps> = ({ onComplete, userData, isSubmitting = 
 
   return (
     <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-emerald-200">
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-900 font-semibold transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" /> Back
+      </button>
+
       <div className="text-center">
         <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-[2rem] bg-gradient-to-br from-white to-emerald-50 shadow-xl">
           <RobotAvatar avatarId={avatar.id} size="xl" animated />

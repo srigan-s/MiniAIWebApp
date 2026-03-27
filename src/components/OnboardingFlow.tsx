@@ -95,6 +95,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, onBackToLog
         {step === 4 && (
           <Welcome 
             onComplete={handleStepComplete}
+            onBack={handleBack}
             userData={userData}
             isSubmitting={isSubmitting}
           />

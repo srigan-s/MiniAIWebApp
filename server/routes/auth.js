@@ -14,8 +14,8 @@ authRouter.post('/signup', async (req, res) => {
     return res.status(400).json({ error: 'Name is required.' });
   }
 
-  if (!Number.isInteger(age) || age <= 5) {
-    return res.status(400).json({ error: 'Age must be greater than 5.' });
+  if (!Number.isInteger(age) || age <= 12) {
+    return res.status(400).json({ error: 'Age must be 12 or older.' });
   }
 
   if (!isValidEmail(email)) {
