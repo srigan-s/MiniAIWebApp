@@ -52,7 +52,7 @@ const LessonModule: React.FC<LessonModuleProps> = ({ lessonId, onComplete }) => 
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className={`${lessonId === 5 ? 'max-w-6xl' : 'max-w-4xl'} mx-auto`}>
       {renderLesson()}
     </div>
   );
