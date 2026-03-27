@@ -78,7 +78,7 @@ export const lessons = [
   },
 ];
 
-export const lessonSequence = [1, 2, 3, 4, 5, 6, 7];
+export const lessonSequence = [1, 5, 3, 4, 2, 6, 7];
 
 export const games = [
   {
