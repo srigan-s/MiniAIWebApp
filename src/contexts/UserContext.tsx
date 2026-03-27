@@ -17,6 +17,11 @@ export interface LevelCelebration {
   avatarId?: string;
 }
 
+export interface CourseCompletionNotice {
+  id: string;
+  studentName: string;
+}
+
 interface UserContextType {
   user: User | null;
   updateUser: (updates: Partial<User>) => void;
@@ -28,6 +33,8 @@ interface UserContextType {
   dismissBadgeToast: (toastId: string) => void;
   levelCelebration: LevelCelebration | null;
   dismissLevelCelebration: () => void;
+  courseCompletionNotice: CourseCompletionNotice | null;
+  dismissCourseCompletionNotice: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -58,6 +65,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
   const [user, setUser] = useState<User | null>(normalizeUserLevel(initialUser));
   const [badgeToasts, setBadgeToasts] = useState<BadgeToast[]>([]);
   const [levelCelebration, setLevelCelebration] = useState<LevelCelebration | null>(null);
+  const [courseCompletionNotice, setCourseCompletionNotice] = useState<CourseCompletionNotice | null>(null);
   const syncQueueRef = useRef(Promise.resolve());
 
   const persistUserSession = (nextUser: User) => {
@@ -222,6 +230,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
   }) => {
     let queuedToasts: BadgeToast[] = [];
     let queuedCelebration: LevelCelebration | null = null;
+    let queuedCourseCompletionNotice: CourseCompletionNotice | null = null;
 
     setUser((currentUser) => {
       if (!currentUser) {
@@ -253,6 +262,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
         id: `${badge.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         badge,
       }));
+      if (newBadges.some((badge) => badge.id === 'quest-master')) {
+        queuedCourseCompletionNotice = {
+          id: `course-complete-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          studentName: currentUser.name,
+        };
+      }
       queuedCelebration = {
         id: `level-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         level,
@@ -281,6 +296,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
     if (queuedCelebration) {
       setLevelCelebration(queuedCelebration);
     }
+
+    if (queuedCourseCompletionNotice) {
+      setCourseCompletionNotice(queuedCourseCompletionNotice);
+    }
   };
 
   const completeLesson = (lessonId: number, xpReward: number) => {
@@ -299,6 +318,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
     setLevelCelebration(null);
   };
 
+  const dismissCourseCompletionNotice = () => {
+    setCourseCompletionNotice(null);
+  };
+
   return (
     <UserContext.Provider value={{
       user,
@@ -311,6 +334,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode; initialUser: Us
       dismissBadgeToast,
       levelCelebration,
       dismissLevelCelebration,
+      courseCompletionNotice,
+      dismissCourseCompletionNotice,
     }}>
       {children}
     </UserContext.Provider>

@@ -12,6 +12,7 @@ import Header from './components/Header';
 import ChatbotHelper from './components/ChatbotHelper';
 import BadgeToastContainer from './components/feedback/BadgeToastContainer';
 import LevelCelebrationModal from './components/feedback/LevelCelebrationModal';
+import CourseCompletionModal from './components/feedback/CourseCompletionModal';
 import { useUser } from './contexts/UserContext';
 import { loginUser } from './lib/authApi';
 const USER_STORAGE_KEY = 'aiLearningUserSession';
@@ -255,7 +256,14 @@ const AppShell = ({
   handleStartLesson: (lessonId: number) => void;
   handleStartGame: (gameId: string) => void;
 }) => {
-  const { badgeToasts, dismissBadgeToast, levelCelebration, dismissLevelCelebration } = useUser();
+  const {
+    badgeToasts,
+    dismissBadgeToast,
+    levelCelebration,
+    dismissLevelCelebration,
+    courseCompletionNotice,
+    dismissCourseCompletionNotice,
+  } = useUser();
 
   const helperView: 'dashboard' | 'lesson' | 'game' =
     currentView === 'lesson' || currentView === 'game' ? currentView : 'dashboard';
@@ -298,6 +306,7 @@ const AppShell = ({
 
       <BadgeToastContainer toasts={badgeToasts} onDismiss={dismissBadgeToast} />
       <LevelCelebrationModal celebration={levelCelebration} onDismiss={dismissLevelCelebration} />
+      <CourseCompletionModal notice={courseCompletionNotice} onDismiss={dismissCourseCompletionNotice} />
 
       <ChatbotHelper
         currentView={helperView}
