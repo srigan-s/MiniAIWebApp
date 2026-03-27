@@ -1,8 +1,9 @@
-import React from 'react';
-import { CalendarDays, Mail, ShieldCheck, Sparkles, Trophy, UserRound } from 'lucide-react';
+import React, { useState } from 'react';
+import { CalendarDays, Download, Mail, ShieldCheck, Sparkles, Trophy, UserRound } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { games, lessons } from '../data/learningContent';
 import { RobotAvatar, getAvatarOptionById } from '../lib/avatarOptions';
+import { downloadMiniAICertificate } from '../lib/certificate';
 import BadgeDisplay from './dashboard/BadgeDisplay';
 import CharacterEvolution from './dashboard/CharacterEvolution';
 import ProgressBar from './dashboard/ProgressBar';
@@ -23,6 +24,7 @@ const rankMilestones = [
 
 const ProfilePage: React.FC = () => {
   const { user } = useUser();
+  const [isDownloadingCertificate, setIsDownloadingCertificate] = useState(false);
 
   if (!user) {
     return null;
@@ -41,6 +43,8 @@ const ProfilePage: React.FC = () => {
     .filter((game) => user.completedGames.includes(game.id))
     .map((game) => game.title);
   const avatar = getAvatarOptionById(user.avatar);
+  const hasCompletedEverything =
+    user.completedLessons.length === lessons.length && user.completedGames.length === games.length;
 
   return (
     <div className="space-y-8">
@@ -209,6 +213,42 @@ const ProfilePage: React.FC = () => {
               {user.name} is currently ranked as {currentRank}, with {user.xp} XP, {completedActivities}
               {' '}completed activities, and {user.badges.length} earned badge{user.badges.length === 1 ? '' : 's'}.
             </p>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-xl p-8 border-4 border-emerald-200">
+            <div className="flex items-center gap-3 mb-4">
+              <Download className="w-8 h-8 text-emerald-600" />
+              <h2 className="text-2xl font-bold text-gray-800">Completion Certificate</h2>
+            </div>
+            <p className="text-gray-600 leading-7">
+              {hasCompletedEverything
+                ? 'You finished every lesson and challenge. Your MiniAI completion certificate is ready to download as a PDF.'
+                : 'Finish every lesson and every AI challenge to unlock your downloadable MiniAI completion certificate.'}
+            </p>
+            <button
+              type="button"
+              disabled={!hasCompletedEverything || isDownloadingCertificate}
+              onClick={async () => {
+                if (!hasCompletedEverything) return;
+                setIsDownloadingCertificate(true);
+                try {
+                  await downloadMiniAICertificate(user.name);
+                } finally {
+                  setIsDownloadingCertificate(false);
+                }
+              }}
+              className={`mt-5 w-full rounded-2xl px-5 py-4 text-lg font-bold transition ${
+                hasCompletedEverything && !isDownloadingCertificate
+                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg hover:scale-[1.01]'
+                  : 'cursor-not-allowed bg-slate-200 text-slate-500'
+              }`}
+            >
+              {isDownloadingCertificate
+                ? 'Preparing certificate...'
+                : hasCompletedEverything
+                  ? 'Download PDF Certificate'
+                  : 'Certificate Locked'}
+            </button>
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl p-8 border-4 border-indigo-200">
